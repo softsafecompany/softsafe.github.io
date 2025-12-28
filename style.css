@@ -1,0 +1,70 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background-color: #0a1020;
+  color: #e0e6f0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 40px;
+  background: #050a18;
+}
+
+.header a {
+  color: #8faaff;
+  margin-left: 20px;
+  text-decoration: none;
+}
+
+.hero {
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.hero button {
+  background: #1f4cff;
+  border: none;
+  padding: 15px 30px;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.produtos, .sobre {
+  padding: 60px 40px;
+}
+
+.produto {
+  background: #0f1730;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
+.produto button {
+  margin-top: 10px;
+  background: #1f4cff;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  cursor: pointer;
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  background: #050a18;
+  font-size: 0.9rem;
+}
