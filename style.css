@@ -195,9 +195,18 @@ body {
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
+  transition: background-color 0.3s;
 
   &:hover {
-    color: rgb(255, 255, 255);
-    background: #882001;
+    background-color: #3a66ff;
   }
+}
+
+.download-btn.downloading {
+  background-color: #882001;
+  cursor: not-allowed;
+}
+
+.download-btn.downloading:hover {
+  background-color: #1f4cff;
 }
