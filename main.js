@@ -35,7 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("modal-size").textContent = product.size;
     document.getElementById("modal-version").textContent = product.version;
     document.getElementById("modal-compatibility").textContent = product.compatibility;
-    document.getElementById("modal-description").textContent = product.description;
+    document.getElementById("modal-description").innerHTML = product.description.replace(/\n/g, '<br>');
+
+    const downloadBtn = document.querySelector(".download-btn");
+    downloadBtn.onclick = () => {
+      window.location.href = product.download_link;
+    };
+
     modal.style.display = "block";
   }
 

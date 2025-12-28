@@ -75,16 +75,28 @@ body {
   padding: 60px 40px;
 }
 
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+
 .produto {
   background: #0f1730;
   padding: 20px;
   margin-top: 20px;
   border-radius: 8px;
   text-align: center;
+  flex: 1 1 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .produto img {
-  max-width: 100%;
+  width: 15vw;
   height: auto;
   border-radius: 8px;
 }
@@ -159,6 +171,8 @@ body {
 }
 
 .download-btn {
+  display: block;
+  margin: 20px auto 0;
   background-color: #1f4cff;
   color: white;
   padding: 12px 25px;
@@ -166,5 +180,4 @@ body {
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
-  margin-top: 20px;
 }
