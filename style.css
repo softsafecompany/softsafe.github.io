@@ -50,13 +50,24 @@ body {
   margin-bottom: 20px;
 }
 
+.h1small {
+  font-size: 0.5rem;
+}
+
 .hero button {
+  margin-top: 30px;
   background: #1f4cff;
   border: none;
   padding: 15px 30px;
-  color: white;
+  color: #e1e2e3;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 7px;
+  font-size: medium;
+  font-weight: 500;
+
+  &:hover {
+    background: #3a66ff;
+  }
 }
 
 .produtos,
@@ -107,7 +118,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .modal-content {
