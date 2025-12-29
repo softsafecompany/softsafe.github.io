@@ -663,6 +663,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Helper function to close modal with fade out
+  function closeModalWithFade(modalElement, callback) {
+    if (!modalElement) return;
+    modalElement.classList.add("fade-out");
+    setTimeout(() => {
+      modalElement.style.display = "none";
+      modalElement.classList.remove("fade-out");
+      if (callback) callback();
+    }, 300); // Match animation duration
+  }
+
   // Open modal with product details
   function openModal(product) {
     document.getElementById("modal-title").textContent = product.title;
@@ -772,6 +783,30 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.toggle("dark-mode");
       themeToggleBtn.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
     });
+  }
+
+  // Close modals on ESC key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (modal && modal.style.display === "block") closeModalWithFade(modal);
+      if (zoomModal && zoomModal.style.display === "block") closeModalWithFade(zoomModal);
+      if (shareModal && shareModal.style.display === "block") closeModalWithFade(shareModal);
+      if (welcomeModal && welcomeModal.style.display === "block") closeWelcome();
+
+      // Close burger menu
+      if (navMenu && navMenu.classList.contains("active")) {
+        navMenu.classList.remove("active");
+        document.body.classList.remove("menu-open");
+        if (menuOverlay) menuOverlay.classList.remove("active");
+      }
+    }
+  });
+
+  // Dynamic Copyright Year
+  const footerP = document.querySelector(".footer p");
+  if (footerP) {
+    const currentYear = new Date().getFullYear();
+    footerP.innerHTML = `&copy; ${currentYear} SoftSafe — Todos os direitos reservados`;
   }
 });
 
