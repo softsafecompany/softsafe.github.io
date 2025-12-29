@@ -1152,16 +1152,26 @@ body.dark-mode .news-card:hover {
   margin-bottom: 15px;
 }
 
-.news-link {
-  display: inline-block;
+.news-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 10px;
+  background-color: transparent;
   color: #1f4cff;
-  font-weight: bold;
-  text-decoration: none;
+  border: 2px solid #1f4cff;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
-.news-link:hover {
-  text-decoration: underline;
+.news-link-btn:hover {
+  background-color: #1f4cff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(31, 76, 255, 0.3);
 }
 
 .like-btn {
@@ -1210,12 +1220,27 @@ body.dark-mode .like-btn.liked {
   margin-bottom: 20px;
 }
 
-.comment-form input,
-.comment-form textarea {
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+.comment-form input[type="text"],
+.comment-form textarea,
+.comment-form input[type="file"] {
   width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  font-size: 0.95rem;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.comment-form input[type="text"]:focus,
+.comment-form textarea:focus {
+  border-color: #1f4cff;
+  box-shadow: 0 0 0 4px rgba(31, 76, 255, 0.1);
+  background-color: #fff;
 }
 
 .comment-list {
@@ -1334,4 +1359,47 @@ body.dark-mode .sort-comments-select {
 .comment .comment {
   background: transparent;
   padding: 10px 0 0 0;
+}
+
+/* News Modal Specifics */
+.news-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.news-modal-content {
+  width: 75%;
+  max-width: 1000px;
+  margin: 5vh auto;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Mode Inputs */
+body.dark-mode .comment-form input[type="text"],
+body.dark-mode .comment-form textarea,
+body.dark-mode .comment-form input[type="file"] {
+  background-color: #252525;
+  border-color: #444;
+  color: #e1e2e3;
+  box-shadow: none;
+}
+
+body.dark-mode .comment-form input[type="text"]:focus,
+body.dark-mode .comment-form textarea:focus {
+  border-color: #3a66ff;
+  background-color: #2a2a2a;
+  box-shadow: 0 0 0 4px rgba(58, 102, 255, 0.15);
+}
+
+body.dark-mode .comment-form input[type="file"] {
+  padding: 10px;
+}
+
+/* File Input Customization */
+.comment-form input[type="file"]::file-selector-button {
+  display: none;
 }

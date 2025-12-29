@@ -28,6 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuOverlay = document.getElementById("menu-overlay");
   const scrollIndicator = document.getElementById("scroll-indicator");
   const newsList = document.getElementById("news-list");
+  const newsModal = document.getElementById("news-modal");
+  const closeNewsBtn = document.querySelector(".close-news");
+  const newsCarousel = document.getElementById("news-carousel");
+  const newsCarouselInner = document.getElementById("news-carousel-inner");
+  const newsPrev = document.getElementById("news-carousel-prev");
+  const newsNext = document.getElementById("news-carousel-next");
+  const newsDots = document.getElementById("news-carousel-dots");
 
   // Burger Menu Logic
   if (burgerMenu && navMenu) {
@@ -358,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let extraContent = "";
       if (item.extra_image) extraContent += `<img src="${item.extra_image}" alt="Extra">`;
       if (item.extra_text) extraContent += `<p>${item.extra_text}</p>`;
-      if (item.link) extraContent += `<a href="${item.link}" class="news-link" target="_blank">Saiba Mais</a>`;
+      extraContent += `<button class="news-link-btn" onclick="openNewsModal(${item.id})">Saiba Mais</button>`;
 
       card.innerHTML = `
         <h3>${item.title}</h3>
@@ -416,6 +423,122 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       loadMoreNewsBtn.style.display = "none";
     }
+  }
+
+  // News Carousel Logic
+  let currentNewsMedia = [];
+  let currentNewsIndex = 0;
+
+  function renderNewsCarousel() {
+    if (!newsCarouselInner) return;
+    newsCarouselInner.innerHTML = "";
+    if (newsDots) newsDots.innerHTML = "";
+
+    currentNewsMedia.forEach((media, index) => {
+      const item = document.createElement("div");
+      item.className = "carousel-item";
+
+      const img = document.createElement("img");
+      img.src = media.src;
+      img.alt = "News Image";
+      img.style.display = "block";
+      img.onclick = () => openZoom(media.src);
+
+      item.appendChild(img);
+      newsCarouselInner.appendChild(item);
+
+      if (newsDots) {
+        const dot = document.createElement("span");
+        dot.className = "dot";
+        dot.onclick = () => {
+          currentNewsIndex = index;
+          updateNewsCarouselPosition();
+        };
+        newsDots.appendChild(dot);
+      }
+    });
+    updateNewsCarouselPosition();
+  }
+
+  function updateNewsCarouselPosition() {
+    if (!newsCarouselInner) return;
+    newsCarouselInner.style.transform = `translateX(-${currentNewsIndex * 100}%)`;
+
+    if (newsDots) {
+      const dots = newsDots.getElementsByClassName("dot");
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active", "");
+      }
+      if (dots[currentNewsIndex]) {
+        dots[currentNewsIndex].className += " active";
+      }
+    }
+  }
+
+  if (newsPrev && newsNext) {
+    newsPrev.addEventListener("click", () => {
+      if (currentNewsMedia.length <= 1) return;
+      currentNewsIndex = (currentNewsIndex > 0) ? currentNewsIndex - 1 : currentNewsMedia.length - 1;
+      updateNewsCarouselPosition();
+    });
+    newsNext.addEventListener("click", () => {
+      if (currentNewsMedia.length <= 1) return;
+      currentNewsIndex = (currentNewsIndex < currentNewsMedia.length - 1) ? currentNewsIndex + 1 : 0;
+      updateNewsCarouselPosition();
+    });
+  }
+
+  // News Modal Logic
+  window.openNewsModal = function (id) {
+    const item = allNews.find(n => n.id === id);
+    if (!item) return;
+
+    document.getElementById("news-modal-title").textContent = item.title;
+    document.getElementById("news-modal-date").textContent = item.date ? `📅 ${item.date}` : "";
+
+    // Prepare Media
+    currentNewsMedia = [];
+    if (item.image) currentNewsMedia.push({ src: item.image });
+    if (item.extra_image) currentNewsMedia.push({ src: item.extra_image });
+
+    const imgElem = document.getElementById("news-modal-image");
+
+    if (currentNewsMedia.length > 1) {
+      // Show Carousel
+      imgElem.style.display = "none";
+      if (newsCarousel) newsCarousel.style.display = "block";
+      currentNewsIndex = 0;
+      renderNewsCarousel();
+    } else {
+      // Show Single Image
+      if (newsCarousel) newsCarousel.style.display = "none";
+      if (item.image) {
+        imgElem.src = item.image;
+        imgElem.style.display = "block";
+      } else {
+        imgElem.style.display = "none";
+      }
+    }
+
+    let bodyContent = `<p style="margin-bottom: 15px;">${item.text}</p>`;
+    if (item.extra_text) bodyContent += `<p style="margin-bottom: 15px;">${item.extra_text}</p>`;
+    if (currentNewsMedia.length <= 1 && item.extra_image && !item.image) bodyContent += `<img src="${item.extra_image}" style="width:100%; border-radius:8px; margin-top:10px;">`;
+
+    document.getElementById("news-modal-body").innerHTML = bodyContent;
+
+    const actionsDiv = document.getElementById("news-modal-actions");
+    actionsDiv.innerHTML = "";
+    if (item.link && item.link !== "#") {
+      actionsDiv.innerHTML = `<a href="${item.link}" target="_blank" class="download-btn">Visitar Link Original</a>`;
+    }
+
+    if (newsModal) newsModal.style.display = "block";
+  };
+
+  if (closeNewsBtn) {
+    closeNewsBtn.addEventListener("click", () => {
+      if (newsModal) closeModalWithFade(newsModal);
+    });
   }
 
   // Expose Like functions to window
@@ -522,7 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="comment-content">
           <h5>${c.name} <small style="font-weight:normal; color:#888;">${c.date}</small></h5>
           <p>${c.text}</p>
-          ${c.image ? `<img src="${c.image}" class="comment-img" onclick="openZoom('${c.image}')" style="cursor:zoom-in">` : ''}
+          ${c.image ? `<img src="${c.image}" class="comment-img" style="cursor:zoom-in">` : ''}
           <div class="comment-actions">
              <button class="comment-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleCommentLike(${newsId}, ${c.id})">
                👍 <span id="comment-like-count-${c.id}">${c.likes || 0}</span>
@@ -556,6 +679,13 @@ document.addEventListener("DOMContentLoaded", () => {
       container.appendChild(renderCommentNode(c));
     });
   }
+
+  // Event delegation for comment image zoom
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList.contains('comment-img')) {
+      openZoom(e.target.src);
+    }
+  });
 
   window.toggleReplyForm = function (commentId) {
     const form = document.getElementById(`reply-form-${commentId}`);
@@ -1063,6 +1193,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target == shareModal) {
       closeModalWithFade(shareModal);
     }
+    if (event.target == newsModal) {
+      closeModalWithFade(newsModal);
+    }
     if (event.target == welcomeModal) {
       closeWelcome();
     }
@@ -1088,6 +1221,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (modal && modal.style.display === "block") closeModalWithFade(modal);
       if (zoomModal && zoomModal.style.display === "block") closeModalWithFade(zoomModal);
       if (shareModal && shareModal.style.display === "block") closeModalWithFade(shareModal);
+      if (newsModal && newsModal.style.display === "block") closeModalWithFade(newsModal);
       if (welcomeModal && welcomeModal.style.display === "block") closeWelcome();
 
       // Close burger menu
