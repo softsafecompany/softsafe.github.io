@@ -19,6 +19,71 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetZoomBtn = document.getElementById("reset-zoom");
   const progressBar = document.getElementById("progress-bar");
   const sobreSection = document.getElementById("sobre");
+  const backToTopBtn = document.getElementById("back-to-top");
+  const welcomeModal = document.getElementById("welcome-modal");
+  const closeWelcomeBtn = document.querySelector(".close-welcome");
+  const acceptWelcomeBtn = document.getElementById("accept-welcome");
+  const burgerMenu = document.getElementById("burger-menu");
+  const navMenu = document.getElementById("nav-menu");
+  const menuOverlay = document.getElementById("menu-overlay");
+  const scrollIndicator = document.getElementById("scroll-indicator");
+
+  // Burger Menu Logic
+  if (burgerMenu && navMenu) {
+    burgerMenu.addEventListener("click", () => {
+      navMenu.classList.toggle("active");
+      document.body.classList.toggle("menu-open");
+      if (menuOverlay) menuOverlay.classList.toggle("active");
+    });
+
+    // Close menu when clicking a link
+    navMenu.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        navMenu.classList.remove("active");
+        document.body.classList.remove("menu-open");
+        if (menuOverlay) menuOverlay.classList.remove("active");
+      });
+    });
+
+    // Close menu when clicking overlay
+    if (menuOverlay) {
+      menuOverlay.addEventListener("click", () => {
+        navMenu.classList.remove("active");
+        document.body.classList.remove("menu-open");
+        menuOverlay.classList.remove("active");
+      });
+    }
+  }
+
+  // Close burger menu on resize
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 620 && navMenu && navMenu.classList.contains("active")) {
+      navMenu.classList.remove("active");
+      document.body.classList.remove("menu-open");
+      if (menuOverlay) menuOverlay.classList.remove("active");
+    }
+  });
+
+  // Swipe to close menu (Mobile)
+  let menuTouchStartX = 0;
+  let menuTouchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    if (navMenu && navMenu.classList.contains('active')) {
+      menuTouchStartX = e.changedTouches[0].screenX;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    if (navMenu && navMenu.classList.contains('active')) {
+      menuTouchEndX = e.changedTouches[0].screenX;
+      if (menuTouchEndX > menuTouchStartX + 50) { // Swipe Right to close
+        navMenu.classList.remove('active');
+        document.body.classList.remove('menu-open');
+        if (menuOverlay) menuOverlay.classList.remove("active");
+      }
+    }
+  });
 
   // Parallax Effect for Hero
   const heroSection = document.querySelector(".hero");
@@ -50,6 +115,42 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     setTimeout(typeWriter, 500); // Atraso inicial
+  }
+
+  // Scroll Indicator Logic
+  if (scrollIndicator) {
+    scrollIndicator.addEventListener("click", () => {
+      const nextSection = document.getElementById("produtos");
+      if (nextSection) nextSection.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  // WhatsApp Shake Logic
+  const whatsappBtn = document.querySelector(".whatsapp-float");
+  if (whatsappBtn) {
+    setInterval(() => {
+      whatsappBtn.classList.add("shake-anim");
+      setTimeout(() => {
+        whatsappBtn.classList.remove("shake-anim");
+      }, 1000);
+    }, 30000);
+  }
+
+  // Confetti Logic
+  function triggerConfetti() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500'];
+    for (let i = 0; i < 100; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animation = `confetti-fall ${Math.random() * 3 + 2}s linear forwards`;
+      document.body.appendChild(confetti);
+
+      setTimeout(() => {
+        confetti.remove();
+      }, 5000);
+    }
   }
 
   // Share Elements
@@ -253,6 +354,38 @@ document.addEventListener("DOMContentLoaded", () => {
     progressBar.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
   });
 
+  // Back to Top Logic
+  if (backToTopBtn) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        backToTopBtn.style.display = "block";
+      } else {
+        backToTopBtn.style.display = "none";
+      }
+    });
+
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  // Welcome Modal Logic (Cookie/LocalStorage)
+  if (welcomeModal && !localStorage.getItem("softsafe_welcome_seen")) {
+    setTimeout(() => {
+      welcomeModal.style.display = "block";
+    }, 1000);
+  }
+
+  function closeWelcome() {
+    if (welcomeModal) {
+      welcomeModal.style.display = "none";
+      localStorage.setItem("softsafe_welcome_seen", "true");
+    }
+  }
+
+  if (closeWelcomeBtn) closeWelcomeBtn.addEventListener("click", closeWelcome);
+  if (acceptWelcomeBtn) acceptWelcomeBtn.addEventListener("click", closeWelcome);
+
   // Carousel Logic
   function renderCarousel() {
     if (!carouselInner) return;
@@ -411,11 +544,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (closeZoom) {
     closeZoom.onclick = () => {
-      zoomModal.style.display = "none";
-      currentScale = 1;
-      translateX = 0;
-      translateY = 0;
-      zoomImg.style.transform = "";
+      closeModalWithFade(zoomModal, () => {
+        currentScale = 1;
+        translateX = 0;
+        translateY = 0;
+        zoomImg.style.transform = "";
+      });
     };
   }
 
@@ -495,11 +629,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("click", (e) => {
     if (e.target === zoomModal) {
-      zoomModal.style.display = "none";
-      currentScale = 1;
-      translateX = 0;
-      translateY = 0;
-      zoomImg.style.transform = "";
+      closeModalWithFade(zoomModal, () => {
+        currentScale = 1;
+        translateX = 0;
+        translateY = 0;
+        zoomImg.style.transform = "";
+      });
     }
   });
 
@@ -571,6 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadBtn.disabled = false;
 
     downloadBtn.onclick = () => {
+      triggerConfetti();
       downloadBtn.classList.add("downloading");
       downloadBtn.textContent = "Baixando...";
       downloadBtn.disabled = true;
@@ -582,21 +718,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Close modal
   closeBtn.addEventListener("click", () => {
-    modal.style.display = "none";
+    closeModalWithFade(modal, () => {
+    });
   });
 
   window.addEventListener("click", (event) => {
     if (event.target == modal) {
-      modal.style.display = "none";
+      closeModalWithFade(modal, () => {
+      });
     }
     if (event.target == shareModal) {
-      shareModal.style.display = "none";
+      closeModalWithFade(shareModal);
+    }
+    if (event.target == welcomeModal) {
+      closeWelcome();
     }
   });
 
   if (closeShareBtn) {
     closeShareBtn.addEventListener("click", () => {
-      if (shareModal) shareModal.style.display = "none";
+      if (shareModal) closeModalWithFade(shareModal);
     });
   }
 
