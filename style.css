@@ -125,6 +125,10 @@ body {
 
 /* Responsive Menu (max-width: 828px) */
 @media (max-width: 828px) {
+  .header {
+    padding: 10px 20px;
+  }
+
   .burger-menu {
     display: flex;
     z-index: 1001;
@@ -192,7 +196,8 @@ body {
   .header-controls {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 
