@@ -52,6 +52,34 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(typeWriter, 500); // Atraso inicial
   }
 
+  // WhatsApp Shake Logic
+  const whatsappBtn = document.querySelector(".whatsapp-float");
+  if (whatsappBtn) {
+    setInterval(() => {
+      whatsappBtn.classList.add("shake-anim");
+      setTimeout(() => {
+        whatsappBtn.classList.remove("shake-anim");
+      }, 1000);
+    }, 30000);
+  }
+
+  // Confetti Logic
+  function triggerConfetti() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500'];
+    for (let i = 0; i < 100; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animation = `confetti-fall ${Math.random() * 3 + 2}s linear forwards`;
+      document.body.appendChild(confetti);
+
+      setTimeout(() => {
+        confetti.remove();
+      }, 5000);
+    }
+  }
+
   // Share Elements
   const shareModal = document.getElementById("share-modal");
   const closeShareBtn = document.querySelector(".close-share");
@@ -571,6 +599,7 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadBtn.disabled = false;
 
     downloadBtn.onclick = () => {
+      triggerConfetti();
       downloadBtn.classList.add("downloading");
       downloadBtn.textContent = "Baixando...";
       downloadBtn.disabled = true;
