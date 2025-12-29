@@ -1529,7 +1529,7 @@ body.dark-mode .comment-form input[type="file"] {
 /* News Search */
 .news-search-container {
   max-width: 600px;
-  margin: 0 auto 40px auto;
+  margin: 50px auto 40px auto;
   display: flex;
   gap: 10px;
   padding: 0 20px;
