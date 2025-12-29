@@ -681,6 +681,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const title = getLocalized(item, 'title');
       const text = getLocalized(item, 'text');
+
+      // Mostrar apenas 50% do texto no card
+      const truncatedText = text.length > 0 ? text.substring(0, Math.ceil(text.length / 2)) + "..." : "";
+
       const extraText = getLocalized(item, 'extra_text');
 
       let extraContent = "";
@@ -692,7 +696,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <h3>${title}</h3>
         ${item.date ? `<p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">📅 ${item.date}</p>` : ''}
         <img src="${item.image}" alt="${item.title}">
-        <p>${text}</p>
+        <p>${truncatedText}</p>
         ${extraContent}
         <button class="like-btn" onclick="toggleNewsLike(${item.id})" id="news-like-btn-${item.id}">
           ❤️ <span id="news-like-count-${item.id}">0</span>
@@ -1931,7 +1935,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll("[data-lang]").forEach(el => {
         const key = el.getAttribute("data-lang");
         if (translations[lang][key]) {
-          if (key === 'hero_title') {
+          if (key === 'hero_title' || key === 'news_hero_title') {
             startTypewriter(el, translations[lang][key]);
           } else {
             el.innerHTML = translations[lang][key];

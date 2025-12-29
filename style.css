@@ -121,8 +121,8 @@ body {
     width: 250px;
     height: 100vh;
     background-color: rgba(97, 30, 30, 0.85);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     flex-direction: column;
     align-items: center;
     padding-top: 80px;
