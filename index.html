@@ -10,40 +10,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-    <style>
-      .theme-toggle-float {
-        position: fixed;
-        bottom: 160px; /* Posicionado acima do WhatsApp/Topo */
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: #333;
-        color: #fff;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        z-index: 1000;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        transition: transform 0.3s ease;
-      }
-      .theme-toggle-float:hover {
-        transform: scale(1.1);
-      }
-      body.dark-mode .theme-toggle-float {
-        background-color: #f0f0f0;
-        color: #333;
-      }
-      header.header,
-      section.hero {
-        width: 100vw;
-        min-width: 270px;
-        max-width: 795px;
-        margin-left: auto;
-        margin-right: auto;
-        box-sizing: border-box;
-      }
-    </style>
   </head>
   <body>
     <div id="menu-overlay" class="menu-overlay"></div>
@@ -55,11 +21,34 @@
         <img src="assets/logo.png" alt="Soft Safe Logo" height="37" />
         <h2>SoftSafe</h2>
       </div>
+
+      <!-- Controls moved out of nav to be visible on mobile -->
+      <div class="header-controls">
+        <button id="login-btn" class="login-btn">Login</button>
+        <div class="notification-wrapper">
+          <button
+            id="notification-btn"
+            class="notification-btn"
+            title="Notificações"
+          >
+            🔔 <span id="notification-count" class="notification-badge"></span>
+          </button>
+          <div id="notification-dropdown" class="notification-dropdown">
+            <div class="notification-header">
+              Notificações
+              <button id="mark-all-read">Ler todas</button>
+            </div>
+            <div id="notification-list" class="notification-list"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="burger-menu" id="burger-menu">
         <span></span>
         <span></span>
         <span></span>
       </div>
+
       <nav id="nav-menu">
         <a href="#produtos" data-lang="nav_products">Produtos</a>
         <a href="novidades.html" data-lang="nav_news">Novidades</a>
@@ -73,48 +62,6 @@
           data-lang="nav_profile"
           >Perfil</a
         >
-        <button
-          id="login-btn"
-          class="login-btn"
-          style="
-            margin-left: 10px;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            border: none;
-            background: #007bff;
-            color: white;
-          "
-        >
-          Login
-        </button>
-        <div class="notification-wrapper">
-          <button
-            id="notification-btn"
-            class="notification-btn"
-            title="Notificações"
-          >
-            🔔 <span id="notification-count" class="notification-badge"></span>
-          </button>
-          <div id="notification-dropdown" class="notification-dropdown">
-            <div class="notification-header">
-              Notificações
-              <button
-                id="mark-all-read"
-                style="
-                  font-size: 0.7rem;
-                  background: none;
-                  border: none;
-                  color: blue;
-                  cursor: pointer;
-                "
-              >
-                Ler todas
-              </button>
-            </div>
-            <div id="notification-list" class="notification-list"></div>
-          </div>
-        </div>
       </nav>
     </header>
 
@@ -199,9 +146,7 @@
             <span class="star" data-value="4">★</span>
             <span class="star" data-value="5">★</span>
           </div>
-          <span id="rating-count" style="font-size: 0.9rem; color: #666"
-            >(0 avaliações)</span
-          >
+          <span id="rating-count">(0 avaliações)</span>
         </div>
         <p><strong>Tamanho:</strong> <span id="modal-size"></span></p>
         <p><strong>Versão:</strong> <span id="modal-version"></span></p>
@@ -267,23 +212,8 @@
       <div class="modal-content news-modal-content">
         <span class="close-news">&times;</span>
         <h2 id="news-modal-title"></h2>
-        <p
-          id="news-modal-date"
-          style="color: #888; font-size: 0.9rem; margin-bottom: 15px"
-        ></p>
-        <img
-          id="news-modal-image"
-          src=""
-          alt=""
-          style="
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-          "
-        />
+        <p id="news-modal-date"></p>
+        <img id="news-modal-image" src="" alt="" style="display: none" />
         <div class="carousel" id="news-carousel" style="display: none">
           <div class="carousel-inner" id="news-carousel-inner"></div>
           <button class="carousel-control prev" id="news-carousel-prev">
@@ -294,49 +224,18 @@
           </button>
           <div class="carousel-dots" id="news-carousel-dots"></div>
         </div>
-        <div
-          id="news-modal-body"
-          style="line-height: 1.6; font-size: 1rem"
-        ></div>
-        <div
-          id="news-modal-comments-container"
-          style="
-            margin-top: 30px;
-            border-top: 1px solid #ddd;
-            padding-top: 20px;
-          "
-        ></div>
-        <div
-          class="modal-actions"
-          id="news-modal-actions"
-          style="justify-content: flex-start; margin-top: 20px"
-        ></div>
+        <div id="news-modal-body"></div>
+        <div id="news-modal-comments-container"></div>
+        <div class="modal-actions" id="news-modal-actions"></div>
       </div>
     </div>
 
     <!-- Privacy Policy Modal -->
     <div id="privacy-modal" class="modal">
       <div class="modal-content">
-        <span
-          class="close-privacy"
-          style="
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 28px;
-            cursor: pointer;
-          "
-          >&times;</span
-        >
+        <span class="close-privacy">&times;</span>
         <h2 data-lang="privacy_title">Política de Privacidade</h2>
-        <div
-          style="
-            max-height: 60vh;
-            overflow-y: auto;
-            line-height: 1.6;
-            padding-right: 10px;
-          "
-        >
+        <div class="privacy-content-scroll">
           <p><strong>Última atualização: 25/05/2025</strong></p>
           <p>
             A sua privacidade é importante para nós. É política da SoftSafe
@@ -385,7 +284,6 @@
         <button
           id="accept-welcome"
           class="download-btn"
-          style="margin-top: 15px"
           data-lang="btn_understood"
         >
           Entendi
@@ -396,17 +294,7 @@
     <!-- Contact Modal -->
     <div id="contact-modal" class="modal">
       <div class="modal-content">
-        <span
-          class="close-contact"
-          style="
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 28px;
-            cursor: pointer;
-          "
-          >&times;</span
-        >
+        <span class="close-contact">&times;</span>
         <h2 data-lang="contact_title">Fale Conosco</h2>
         <form class="contact-form" id="contact-form">
           <input
