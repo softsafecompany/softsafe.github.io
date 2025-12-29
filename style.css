@@ -25,9 +25,15 @@ body {
   align-items: center;
   padding: 20px 40px;
   background: #611e1e;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   width: 98%;
   margin: 0 auto;
+}
+
+.header.scrolled {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .header a {
@@ -1600,6 +1606,24 @@ body.dark-mode .news-search-input {
   padding: 2px 5px;
   font-size: 0.7rem;
   display: none;
+  animation: pulse-notification 2s infinite;
+}
+
+@keyframes pulse-notification {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(231, 76, 60, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+  }
 }
 
 .notification-dropdown {

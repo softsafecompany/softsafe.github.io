@@ -57,5 +57,16 @@
       <p>&copy; 2025 SoftSafe</p>
     </footer>
     <script type="module" src="main.js"></script>
+    <script>
+      // Efeito de Sombra no Header ao Rolar
+      window.addEventListener("scroll", () => {
+        const header = document.querySelector(".header");
+        if (window.scrollY > 10) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      });
+    </script>
   </body>
 </html>
