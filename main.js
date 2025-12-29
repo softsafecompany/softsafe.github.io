@@ -1,29 +1,31 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
 // SUBSTITUA COM SUAS CREDENCIAIS REAIS DO CONSOLE DO FIREBASE
 // O erro "auth/api-key-not-valid" ocorre porque estas chaves abaixo são exemplos.
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY_AQUI",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyBZtT7r-2m_4IXj_e3xXc0H5-zJS2G4FQ0",
+  authDomain: "softsafe-company.firebaseapp.com",
+  databaseURL: "https://softsafe-company-default-rtdb.firebaseio.com",
+  projectId: "softsafe-company",
+  storageBucket: "softsafe-company.firebasestorage.app",
+  messagingSenderId: "660443243088",
+  appId: "1:660443243088:web:8a2ad56dcea7c95cdd2755",
+  measurementId: "G-HCTSMFD4N9"
 };
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+console.log("firebase inicializado");
 const auth = getAuth(app);
 
 let currentUser = null;
 let unsubscribeComments = null; // To manage real-time listener
-
-// Autenticação Anônima para identificar o usuário (Tema, Likes)
-signInAnonymously(auth).catch((error) => console.error("Erro Auth:", error));
 
 document.addEventListener("DOMContentLoaded", () => {
   const productList = document.getElementById("product-list");
@@ -67,6 +69,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const contactModal = document.getElementById("contact-modal");
   const closeContactBtn = document.querySelector(".close-contact");
   const contactForm = document.getElementById("contact-form");
+  const stars = document.querySelectorAll('.star');
+  const ratingCountElem = document.getElementById('rating-count');
+
+  // --- Toast Notification Logic ---
+  function showToast(message, type = 'info') {
+    let toast = document.getElementById("toast-notification");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "toast-notification";
+      toast.className = "toast-notification";
+      document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.className = "toast-notification show";
+    if (type === 'error') toast.classList.add("error");
+    else if (type === 'success') toast.classList.add("success");
+
+    setTimeout(() => {
+      toast.className = toast.className.replace("show", "");
+    }, 3000);
+  }
+
+  window.addEventListener('offline', () => {
+    showToast("Você está offline. Algumas funcionalidades podem estar limitadas.", "error");
+  });
+
+  window.addEventListener('online', () => {
+    showToast("Conexão restabelecida!", "success");
+  });
+
+  // Autenticação Anônima (Movido para dentro do DOMContentLoaded para usar o showToast)
+  signInAnonymously(auth).catch((error) => {
+    console.error("Erro Auth:", error);
+    if (error.code === 'auth/configuration-not-found') {
+      showToast("Configuração pendente: Ative a Autenticação Anônima no Firebase Console.", "error");
+    } else {
+      showToast("Erro ao conectar com o servidor.", "error");
+    }
+  });
 
   // --- Contact Modal Logic ---
   // Intercept links to #contato
@@ -306,6 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const ITEMS_PER_PAGE = 6;
   let currentPage = 1;
   let currentCarouselIndex = 0;
+  let currentOpenProductId = null;
   let currentMedia = [];
 
   // Product Logic (Only if productList exists)
@@ -373,6 +416,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const countElem = document.querySelector(`#product-views-${product.id} .view-count`);
           if (countElem) countElem.textContent = doc.data().clicks || 0;
         }
+      }, (error) => {
+        console.warn(`Permissão negada (Views): ${error.code}`);
       });
     });
     productList.insertAdjacentHTML('beforeend', productsHTML);
@@ -521,6 +566,8 @@ document.addEventListener("DOMContentLoaded", () => {
           // Para produção robusta, use subcoleção 'likes'. Aqui simplificado:
           // A verificação visual de "liked" depende de ler a subcoleção, faremos isso no toggle ou carga separada.
         }
+      }, (error) => {
+        console.warn(`Permissão negada (Likes): ${error.code}`);
       });
     });
 
@@ -860,6 +907,9 @@ document.addEventListener("DOMContentLoaded", () => {
       roots.forEach(c => {
         container.appendChild(renderCommentNode(c));
       });
+    }, (error) => {
+      console.warn("Erro ao carregar comentários:", error.code);
+      container.innerHTML = `<p style="color: #888; font-size: 0.9rem;">Comentários indisponíveis (Verifique as regras do Firebase).</p>`;
     });
   }
 
@@ -1282,6 +1332,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Open modal with product details
   function openModal(product) {
+    currentOpenProductId = product.id;
     document.getElementById("modal-title").textContent = product.title;
     document.getElementById("modal-size").textContent = product.size;
     document.getElementById("modal-version").textContent = product.version;
@@ -1291,6 +1342,29 @@ document.addEventListener("DOMContentLoaded", () => {
     // Incrementar contador de cliques (views) do produto no Firestore
     updateDoc(doc(db, "products", String(product.id)), { clicks: increment(1) }).catch(() => {
       setDoc(doc(db, "products", String(product.id)), { clicks: 1 }, { merge: true });
+    });
+
+    // Reset Stars
+    stars.forEach(s => s.classList.remove('filled'));
+    if (ratingCountElem) ratingCountElem.textContent = "(Carregando...)";
+
+    // Listen for Rating Updates
+    onSnapshot(doc(db, "products", String(product.id)), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const avg = data.averageRating || 0;
+        const count = data.ratingCount || 0;
+
+        stars.forEach(s => {
+          s.classList.toggle('filled', parseInt(s.dataset.value) <= Math.round(avg));
+        });
+        if (ratingCountElem) ratingCountElem.textContent = `(${avg.toFixed(1)} / ${count} avaliações)`;
+      } else {
+        if (ratingCountElem) ratingCountElem.textContent = "(0 avaliações)";
+      }
+    }, (error) => {
+      console.warn("Erro ao carregar avaliações:", error.code);
+      if (ratingCountElem) ratingCountElem.textContent = "(Offline)";
     });
 
     // Setup Carousel
@@ -1361,6 +1435,56 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     modal.style.display = "block";
+  }
+
+  // Handle Star Click
+  if (stars) {
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        const rating = parseInt(star.dataset.value);
+        if (!currentUser) {
+          alert("Aguarde a autenticação para avaliar.");
+          return;
+        }
+        if (!currentOpenProductId) return;
+
+        const productRef = doc(db, "products", String(currentOpenProductId));
+        const userRatingRef = doc(db, "products", String(currentOpenProductId), "ratings", currentUser.uid);
+
+        runTransaction(db, async (transaction) => {
+          const productDoc = await transaction.get(productRef);
+          const userRatingDoc = await transaction.get(userRatingRef);
+
+          let newRatingCount = 0;
+          let newAverageRating = 0;
+
+          if (!productDoc.exists()) {
+            newRatingCount = 1;
+            newAverageRating = rating;
+            transaction.set(productRef, { averageRating: rating, ratingCount: 1, clicks: 1 });
+          } else {
+            const data = productDoc.data();
+            const currentAvg = data.averageRating || 0;
+            const currentCount = data.ratingCount || 0;
+
+            if (userRatingDoc.exists()) {
+              const oldRating = userRatingDoc.data().rating;
+              newRatingCount = currentCount;
+              newAverageRating = ((currentAvg * currentCount) - oldRating + rating) / currentCount;
+            } else {
+              newRatingCount = currentCount + 1;
+              newAverageRating = ((currentAvg * currentCount) + rating) / newRatingCount;
+            }
+
+            transaction.update(productRef, {
+              averageRating: newAverageRating,
+              ratingCount: newRatingCount
+            });
+          }
+          transaction.set(userRatingRef, { rating: rating, timestamp: new Date() });
+        }).then(() => console.log("Avaliação salva!")).catch(err => console.error("Erro ao avaliar:", err));
+      });
+    });
   }
 
   // Close modal
