@@ -23,24 +23,24 @@
       <span></span>
     </div>
     <nav id="nav-menu">
-      <a href="#produtos">Produtos</a>
-      <a href="novidades.html">Novidades</a>
-      <a href="#sobre">Sobre</a>
-      <a href="#contato">Contato</a>
+      <a href="#produtos" data-lang="nav_products">Produtos</a>
+      <a href="novidades.html" data-lang="nav_news">Novidades</a>
+      <a href="#sobre" data-lang="nav_about">Sobre</a>
+      <a href="#faq" data-lang="nav_faq">FAQ</a>
+      <a href="#contato" data-lang="nav_contact">Contato</a>
       <button id="theme-toggle" class="theme-toggle" title="Alternar Tema">🌙</button>
     </nav>
   </header>
 
   <section class="hero">
-    <h2>Software que leva seu sistema ao limite certo</h2>
-    <p>Ferramentas profissionais para sistemas operacionais 
-      <br><span class="h1small">Segurança, performance e controle total</span> </p>
+    <h2 data-lang="hero_title">Software que leva seu sistema ao limite certo</h2>
+    <p data-lang="hero_subtitle">Ferramentas profissionais para sistemas operacionais <br><span class="h1small">Segurança, performance e controle total</span></p>
     <div class="search-container">
       <div class="input-wrapper">
-        <input type="text" id="search-bar" placeholder="Pesquisar aplicativos..." autocomplete="off">
+        <input type="text" id="search-bar" placeholder="Pesquisar aplicativos..." data-lang-placeholder="search_placeholder" autocomplete="off">
         <div id="suggestions-container" class="suggestions-container"></div>
       </div>
-      <button id="search-button">Pesquisar</button>
+      <button id="search-button" data-lang="search_btn">Pesquisar</button>
     </div>
     <div id="scroll-indicator" class="scroll-indicator">
       <span></span>
@@ -50,7 +50,7 @@
   </section>
 
   <section id="produtos" class="produtos">
-    <h3>Nossos Programas</h3>
+    <h3 data-lang="section_products">Nossos Programas</h3>
     <div id="product-count" class="product-count"></div>
     <div id="product-list" class="product-list">
       <!-- Os produtos serão inseridos aqui via JavaScript -->
@@ -58,17 +58,17 @@
   </section>
 
   <section id="sobre" class="sobre">
-    <h3>Sobre a Soft Safe</h3>
-    <p>Desenvolvemos software focado em sistemas operacionais, seguindo princípios clássicos de eficiência, estabilidade e segurança.</p>
+    <h3 data-lang="section_about">Sobre a Soft Safe</h3>
+    <p data-lang="about_text">Desenvolvemos software focado em sistemas operacionais, seguindo princípios clássicos de eficiência, estabilidade e segurança.</p>
   </section>
 
   <section id="faq" class="faq-section">
-    <h3>Perguntas Frequentes</h3>
+    <h3 data-lang="section_faq">Perguntas Frequentes</h3>
     <div class="faq-container"></div>
   </section>
 
   <footer id="contato" class="footer">
-    <p>&copy; 2025 SoftSafe — Todos os direitos reservados</p>
+    <p>&copy; 2025 SoftSafe — <span data-lang="footer_rights">Todos os direitos reservados</span></p>
   </footer>
 
   <!-- Modal -->
@@ -97,8 +97,8 @@
       <p><strong>Compatibilidade:</strong> <span id="modal-compatibility"></span></p>
       <p id="modal-description"></p>
       <div class="modal-actions">
-        <button class="download-btn">Download</button>
-        <button class="share-action-btn">Compartilhar</button>
+        <button class="download-btn" data-lang="btn_download">Download</button>
+        <button class="share-action-btn" data-lang="btn_share">Compartilhar</button>
       </div>
     </div>
   </div>
@@ -149,7 +149,7 @@
   <div id="privacy-modal" class="modal">
     <div class="modal-content">
       <span class="close-privacy" style="position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer;">&times;</span>
-      <h2>Política de Privacidade</h2>
+      <h2 data-lang="privacy_title">Política de Privacidade</h2>
       <div style="max-height: 60vh; overflow-y: auto; line-height: 1.6; padding-right: 10px;">
         <p><strong>Última atualização: 25/05/2025</strong></p>
         <p>A sua privacidade é importante para nós. É política da SoftSafe respeitar a sua privacidade em relação a qualquer informação sua que possamos coletar no site SoftSafe, e outros sites que possuímos e operamos.</p>
@@ -158,7 +158,7 @@
         <p>Não compartilhamos informações de identificação pessoal publicamente ou com terceiros, exceto quando exigido por lei.</p>
       </div>
       <div class="modal-actions">
-        <button class="download-btn close-privacy-btn">Entendi</button>
+        <button class="download-btn close-privacy-btn" data-lang="btn_understood">Entendi</button>
       </div>
     </div>
   </div>
@@ -167,9 +167,9 @@
   <div id="welcome-modal" class="modal welcome-modal">
     <div class="modal-content welcome-content">
       <span class="close-welcome">&times;</span>
-      <h2>Bem-vindo à SoftSafe!</h2>
-      <p>Descubra ferramentas profissionais para levar seu sistema ao próximo nível.</p>
-      <button id="accept-welcome" class="download-btn" style="margin-top: 15px;">Entendi</button>
+      <h2 data-lang="welcome_title">Bem-vindo à SoftSafe!</h2>
+      <p data-lang="welcome_text">Descubra ferramentas profissionais para levar seu sistema ao próximo nível.</p>
+      <button id="accept-welcome" class="download-btn" style="margin-top: 15px;" data-lang="btn_understood">Entendi</button>
     </div>
   </div>
 
@@ -177,12 +177,12 @@
   <div id="contact-modal" class="modal">
     <div class="modal-content">
       <span class="close-contact" style="position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer;">&times;</span>
-      <h2>Fale Conosco</h2>
+      <h2 data-lang="contact_title">Fale Conosco</h2>
       <form class="contact-form" id="contact-form">
-        <input type="text" id="contact-name" placeholder="Seu Nome" required>
-        <input type="email" id="contact-email" placeholder="Seu Email" required>
-        <textarea id="contact-message" placeholder="Sua Mensagem" required></textarea>
-        <button type="submit" class="download-btn">Enviar Mensagem</button>
+        <input type="text" id="contact-name" placeholder="Seu Nome" data-lang-placeholder="contact_name_ph" required>
+        <input type="email" id="contact-email" placeholder="Seu Email" data-lang-placeholder="contact_email_ph" required>
+        <textarea id="contact-message" placeholder="Sua Mensagem" data-lang-placeholder="contact_msg_ph" required></textarea>
+        <button type="submit" class="download-btn" data-lang="btn_send_msg">Enviar Mensagem</button>
       </form>
     </div>
   </div>
@@ -194,6 +194,9 @@
 
   <!-- Back to Top Button -->
   <button id="back-to-top" class="back-to-top" title="Voltar ao Topo">↑</button>
+
+  <!-- Language Toggle Button -->
+  <button id="lang-toggle" class="lang-toggle" title="Switch Language">🇺🇸 EN</button>
 
   <script type="module" src="main.js"></script>
 </body>

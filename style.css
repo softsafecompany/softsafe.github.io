@@ -1636,6 +1636,38 @@ body.dark-mode .faq-answer p {
   transform: rotate(45deg);
 }
 
+/* Language Toggle Button */
+.lang-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: all 0.3s;
+}
+
+.lang-toggle:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.05);
+}
+
+body.dark-mode .lang-toggle {
+  background-color: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+body.dark-mode .lang-toggle:hover {
+  background-color: #444;
+}
+
 .news-search-btn {
   padding: 12px 25px;
   background-color: #1f4cff;

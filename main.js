@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stars = document.querySelectorAll('.star');
   const ratingCountElem = document.getElementById('rating-count');
   const privacyModal = document.getElementById("privacy-modal");
+  const langToggleBtn = document.getElementById("lang-toggle");
 
   // --- Custom Alert & Prompt System ---
   // Injeta o HTML do modal de alerta no corpo da página
@@ -1757,6 +1758,108 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".faq-item").forEach(el => observer.observe(el));
       })
       .catch(err => console.error("Erro ao carregar FAQ:", err));
+  }
+
+  // --- Language Translation Logic ---
+  const translations = {
+    pt: {
+      nav_products: "Produtos",
+      nav_news: "Novidades",
+      nav_about: "Sobre",
+      nav_faq: "FAQ",
+      nav_contact: "Contato",
+      hero_title: "Software que leva seu sistema ao limite certo",
+      hero_subtitle: "Ferramentas profissionais para sistemas operacionais <br><span class=\"h1small\">Segurança, performance e controle total</span>",
+      search_placeholder: "Pesquisar aplicativos...",
+      search_btn: "Pesquisar",
+      section_products: "Nossos Programas",
+      section_about: "Sobre a Soft Safe",
+      about_text: "Desenvolvemos software focado em sistemas operacionais, seguindo princípios clássicos de eficiência, estabilidade e segurança.",
+      section_faq: "Perguntas Frequentes",
+      footer_rights: "Todos os direitos reservados",
+      btn_download: "Download",
+      btn_share: "Compartilhar",
+      btn_reset_zoom: "Resetar Zoom",
+      share_title: "Compartilhar",
+      btn_copy_link: "Copiar Link",
+      privacy_title: "Política de Privacidade",
+      btn_understood: "Entendi",
+      welcome_title: "Bem-vindo à SoftSafe!",
+      welcome_text: "Descubra ferramentas profissionais para levar seu sistema ao próximo nível.",
+      contact_title: "Fale Conosco",
+      contact_name_ph: "Seu Nome",
+      contact_email_ph: "Seu Email",
+      contact_msg_ph: "Sua Mensagem",
+      btn_send_msg: "Enviar Mensagem",
+      news_hero_title: "Novidades e Atualizações",
+      news_hero_subtitle: "Fique por dentro de tudo o que acontece na SoftSafe",
+      news_search_ph: "Pesquisar notícias..."
+    },
+    en: {
+      nav_products: "Products",
+      nav_news: "News",
+      nav_about: "About",
+      nav_faq: "FAQ",
+      nav_contact: "Contact",
+      hero_title: "Software that takes your system to the right limit",
+      hero_subtitle: "Professional tools for operating systems <br><span class=\"h1small\">Security, performance, and total control</span>",
+      search_placeholder: "Search apps...",
+      search_btn: "Search",
+      section_products: "Our Programs",
+      section_about: "About Soft Safe",
+      about_text: "We develop software focused on operating systems, following classic principles of efficiency, stability, and security.",
+      section_faq: "Frequently Asked Questions",
+      footer_rights: "All rights reserved",
+      btn_download: "Download",
+      btn_share: "Share",
+      btn_reset_zoom: "Reset Zoom",
+      share_title: "Share",
+      btn_copy_link: "Copy Link",
+      privacy_title: "Privacy Policy",
+      btn_understood: "Got it",
+      welcome_title: "Welcome to SoftSafe!",
+      welcome_text: "Discover professional tools to take your system to the next level.",
+      contact_title: "Contact Us",
+      contact_name_ph: "Your Name",
+      contact_email_ph: "Your Email",
+      contact_msg_ph: "Your Message",
+      btn_send_msg: "Send Message",
+      news_hero_title: "News and Updates",
+      news_hero_subtitle: "Stay up to date with everything happening at SoftSafe",
+      news_search_ph: "Search news..."
+    }
+  };
+
+  let currentLang = localStorage.getItem("softsafe_lang") || "pt";
+
+  function updateLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem("softsafe_lang", lang);
+
+    // Update Button Text
+    if (langToggleBtn) langToggleBtn.textContent = lang === 'pt' ? "🇺🇸 EN" : "🇧🇷 PT";
+
+    // Update Text Content
+    document.querySelectorAll("[data-lang]").forEach(el => {
+      const key = el.getAttribute("data-lang");
+      if (translations[lang][key]) el.innerHTML = translations[lang][key];
+    });
+
+    // Update Placeholders
+    document.querySelectorAll("[data-lang-placeholder]").forEach(el => {
+      const key = el.getAttribute("data-lang-placeholder");
+      if (translations[lang][key]) el.placeholder = translations[lang][key];
+    });
+  }
+
+  // Initialize Language
+  updateLanguage(currentLang);
+
+  if (langToggleBtn) {
+    langToggleBtn.addEventListener("click", () => {
+      const newLang = currentLang === 'pt' ? 'en' : 'pt';
+      updateLanguage(newLang);
+    });
   }
 });
 
