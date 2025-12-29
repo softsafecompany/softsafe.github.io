@@ -1,12 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where, runTransaction
+  getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where, runTransaction, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, setPersistence, browserLocalPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, setPersistence, browserLocalPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail, deleteUser } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
-// SUBSTITUA COM SUAS CREDENCIAIS REAIS DO CONSOLE DO FIREBASE
-// O erro "auth/api-key-not-valid" ocorre porque estas chaves abaixo são exemplos.
+
 const firebaseConfig = {
   apiKey: "AIzaSyBZtT7r-2m_4IXj_e3xXc0H5-zJS2G4FQ0",
   authDomain: "softsafe-company.firebaseapp.com",
@@ -93,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileUpload = document.getElementById("profile-upload");
   const editNameBtn = document.getElementById("edit-name-btn");
   const resetPasswordBtn = document.getElementById("reset-password-btn");
+  const deleteAccountBtn = document.getElementById("delete-account-btn");
   const signupPassInput = document.getElementById("signup-pass");
   const signupStrengthBar = document.getElementById("signup-strength-bar");
   const signupStrengthText = document.getElementById("signup-strength-text");
@@ -106,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const manualLoginBtn = document.getElementById("manual-login-btn");
   const manualSignupBtn = document.getElementById("manual-signup-btn");
   const signupPhoto = document.getElementById("signup-photo");
-  const signupPhotoPreview = document.getElementById("signup-photo-preview");
 
   // Inicializar currentLang no topo para evitar ReferenceError
   let currentLang = localStorage.getItem("softsafe_lang") || "pt";
@@ -227,12 +226,16 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("Conexão restabelecida!", "success");
   });
 
+  // Garantir que o spinner seja removido quando a página carregar completamente
+  window.addEventListener('load', () => toggleLoading(false));
+  setTimeout(() => toggleLoading(false), 8000); // Timeout de segurança
+
   // Verificar resultado do login por redirecionamento (Correção para erro de Popup/COOP)
   toggleLoading(true);
   getRedirectResult(auth)
     .then((result) => {
+      toggleLoading(false); // Garante que o spinner pare mesmo se não houver resultado (login normal)
       if (result) {
-        toggleLoading(false);
         showToast("Login realizado com sucesso!", "success");
       }
     })
@@ -2447,11 +2450,11 @@ document.addEventListener("DOMContentLoaded", () => {
       dialogTitle.textContent = title;
       dialogMessage.textContent = message;
       dialogInputContainer.style.display = 'none';
-      
+
       dialogOk.textContent = okText;
       dialogCancel.textContent = cancelText;
       dialogCancel.style.display = 'inline-block';
-      
+
       dialogOverlay.classList.add('active');
 
       dialogOk.onclick = () => {
@@ -2583,12 +2586,47 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- Delete Account Logic ---
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener("click", () => {
+      customConfirm("Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita e todos os seus dados serão perdidos.", "Excluir Conta", "Excluir", "Cancelar").then((confirmed) => {
+        if (confirmed) {
+          if (currentUser) {
+            toggleLoading(true);
+            // Tentar excluir dados do Firestore primeiro
+            deleteDoc(doc(db, "users", currentUser.uid))
+              .then(() => {
+                // Excluir usuário da autenticação
+                return deleteUser(currentUser);
+              })
+              .then(() => {
+                toggleLoading(false);
+                showToast("Conta excluída com sucesso.", "success");
+                window.location.href = "index.html";
+              })
+              .catch((error) => {
+                toggleLoading(false);
+                console.error("Erro ao excluir conta:", error);
+                if (error.code === 'auth/requires-recent-login') {
+                  customAlert("Por segurança, é necessário fazer login novamente antes de excluir sua conta.", "Login Necessário").then(() => {
+                    signOut(auth).then(() => window.location.href = "index.html");
+                  });
+                } else {
+                  showToast("Erro ao excluir conta: " + error.message, "error");
+                }
+              });
+          }
+        }
+      });
+    });
+  }
+
   // --- Password Strength Logic ---
   if (signupPassInput && signupStrengthBar && signupStrengthText) {
     signupPassInput.addEventListener("input", () => {
       const val = signupPassInput.value;
       let strength = 0;
-      
+
       if (val.length >= 6) strength++;
       if (val.length >= 8 && /[0-9]/.test(val)) strength++;
       if (val.length >= 10 && /[!@#$%^&*]/.test(val) && /[A-Z]/.test(val)) strength++;
@@ -2619,7 +2657,7 @@ document.addEventListener("DOMContentLoaded", () => {
     forgotPasswordLink.addEventListener("click", (e) => {
       e.preventDefault();
       if (loginModal) closeModalWithFade(loginModal);
-      
+
       customPrompt("Digite seu e-mail para redefinir a senha:", "Recuperar Senha").then((email) => {
         if (email) {
           toggleLoading(true);

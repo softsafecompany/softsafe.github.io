@@ -234,12 +234,30 @@
     <div id="zoom-modal" class="zoom-modal">
       <span class="close-zoom">&times;</span>
       <div class="zoom-spinner" id="zoom-spinner" style="display: none"></div>
+      <div
+        id="zoom-error"
+        style="
+          display: none;
+          color: #ff6b6b;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          text-align: center;
+        "
+      >
+        <i
+          class="fas fa-exclamation-triangle"
+          style="font-size: 2rem; margin-bottom: 10px"
+        ></i
+        ><br />Imagem indisponível
+      </div>
       <img
         class="zoom-content"
         id="zoom-img"
         alt="Imagem ampliada"
-        onload="document.getElementById('zoom-spinner').style.display='none'"
-        onerror="document.getElementById('zoom-spinner').style.display='none'"
+        onload="document.getElementById('zoom-spinner').style.display='none'; document.getElementById('zoom-error').style.display='none'"
+        onerror="document.getElementById('zoom-spinner').style.display='none'; document.getElementById('zoom-error').style.display='block'"
       />
       <button id="reset-zoom" class="reset-zoom-btn" data-lang="btn_reset_zoom">
         Resetar Zoom
