@@ -776,24 +776,6 @@ body.menu-open .back-to-top {
   cursor: not-allowed;
 }
 
-@keyframes skeleton-pulse {
-  0% {
-    opacity: 0.6;
-  }
-
-  50% {
-    opacity: 0.3;
-  }
-
-  100% {
-    opacity: 0.6;
-  }
-}
-
-.skeleton-anim {
-  animation: skeleton-pulse 1.5s infinite ease-in-out;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -1344,9 +1344,15 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.toggleCommentLike = function (newsId, commentId) {
+    if (!currentUser) {
+      return customAlert("Você precisa estar conectado para curtir.", "Aviso");
+    }
     // Simplificação: Apenas incrementa no Firestore. Para toggle real, precisa de subcoleção de likes por usuário.
     const commentRef = doc(db, "news_stats", String(newsId), "comments", String(commentId));
-    updateDoc(commentRef, { likes: increment(1) });
+    updateDoc(commentRef, { likes: increment(1) }).catch((error) => {
+      console.error("Erro ao curtir comentário:", error);
+      customAlert("Erro ao curtir. Verifique sua conexão ou login.", "Erro");
+    });
   };
 
   // Search functionality
