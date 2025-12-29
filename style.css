@@ -1966,3 +1966,14 @@ body.dark-mode .custom-dialog-input {
     width: 100%;
   }
 }
+
+@media (max-width: 600px) {
+  .search-container {
+    flex-direction: column;
+    padding: 0 20px;
+  }
+
+  #search-button {
+    width: 100%;
+  }
+}

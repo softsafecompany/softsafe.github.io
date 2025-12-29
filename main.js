@@ -26,6 +26,7 @@ const auth = getAuth(app);
 
 let currentUser = null;
 let unsubscribeComments = null; // To manage real-time listener
+let unsubscribeNotifications = null; // For reply notifications
 
 document.addEventListener("DOMContentLoaded", () => {
   const productList = document.getElementById("product-list");
@@ -252,6 +253,15 @@ document.addEventListener("DOMContentLoaded", () => {
           if (themeToggleBtn) themeToggleBtn.textContent = "☀️";
         }
       });
+      // Listen for notifications
+      listenForNotifications(user.uid);
+    } else {
+      // User signed out
+      currentUser = null;
+      if (unsubscribeNotifications) {
+        unsubscribeNotifications();
+        unsubscribeNotifications = null;
+      }
     }
   });
 
@@ -1081,8 +1091,67 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function createReplyNotification(newsId, parentCommentId, newCommentId, replierName) {
+    if (!currentUser) return;
+
+    const parentCommentRef = doc(db, "news_stats", String(newsId), "comments", parentCommentId);
+    try {
+      const parentCommentSnap = await getDoc(parentCommentRef);
+      if (parentCommentSnap.exists()) {
+        const parentCommentData = parentCommentSnap.data();
+        const recipientId = parentCommentData.userId;
+
+        // Don't notify user if they reply to themselves
+        if (recipientId && recipientId !== currentUser.uid) {
+          await addDoc(collection(db, "notifications"), {
+            recipientId: recipientId,
+            type: 'reply',
+            newsId: newsId,
+            parentCommentId: parentCommentId,
+            newCommentId: newCommentId,
+            read: false,
+            timestamp: new Date(),
+            message: `${replierName} respondeu ao seu comentário.`
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao criar notificação:", error);
+    }
+  }
+
+  function listenForNotifications(userId) {
+    if (unsubscribeNotifications) unsubscribeNotifications();
+
+    const q = query(
+      collection(db, "notifications"),
+      where("recipientId", "==", userId),
+      where("read", "==", false)
+    );
+
+    unsubscribeNotifications = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const notification = change.doc.data();
+          const notificationId = change.doc.id;
+
+          // Show a toast notification
+          showToast(notification.message, "success");
+
+          // Mark notification as read to prevent it from showing again
+          const notifRef = doc(db, "notifications", notificationId);
+          updateDoc(notifRef, { read: true });
+        }
+      });
+    });
+  }
+
   function saveComment(newsId, name, text, image, parentId = null, callback = null) {
+    if (!currentUser) {
+      return customAlert("Você precisa estar conectado para comentar.", "Erro");
+    }
     const comment = {
+      userId: currentUser.uid,
       name,
       text,
       image,
@@ -1093,9 +1162,15 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     addDoc(collection(db, "news_stats", String(newsId), "comments"), comment)
-      .then(() => {
+      .then((docRef) => {
         const statsRef = doc(db, "news_stats", String(newsId));
         setDoc(statsRef, { commentsCount: increment(1) }, { merge: true });
+
+        // If it's a reply, create a notification
+        if (parentId) {
+          createReplyNotification(newsId, parentId, docRef.id, name);
+        }
+
         if (callback) callback();
       });
   }
