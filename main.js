@@ -826,13 +826,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById(`news-btn-${id}`);
     if (!content || !btn) return;
 
+    // Evitar cliques múltiplos durante a animação
+    if (btn.dataset.animating === "true") return;
+    btn.dataset.animating = "true";
+
     const shortText = content.querySelector('.short-text');
     const fullText = content.querySelector('.full-text');
 
     const isExpanded = fullText.style.display === "block";
-    shortText.style.display = isExpanded ? "block" : "none";
-    fullText.style.display = isExpanded ? "none" : "block";
-    btn.textContent = isExpanded ? "Ler Mais" : "Ler Menos";
+
+    if (!isExpanded) {
+      // EXPANDIR (Slide Down)
+      shortText.style.opacity = '0';
+
+      setTimeout(() => {
+        shortText.style.display = 'none';
+
+        fullText.style.display = 'block';
+        fullText.style.height = '0';
+        fullText.style.opacity = '0';
+
+        void fullText.offsetWidth; // Forçar reflow para ativar transição
+
+        fullText.style.height = fullText.scrollHeight + 'px';
+        fullText.style.opacity = '1';
+
+        setTimeout(() => {
+          fullText.style.height = 'auto'; // Permitir redimensionamento responsivo
+          btn.dataset.animating = "false";
+        }, 500);
+      }, 200);
+
+      btn.textContent = "Ler Menos";
+    } else {
+      // COLAPSAR (Slide Up)
+      fullText.style.height = fullText.scrollHeight + 'px';
+      void fullText.offsetWidth; // Forçar reflow
+
+      fullText.style.height = '0';
+      fullText.style.opacity = '0';
+
+      setTimeout(() => {
+        fullText.style.display = 'none';
+        shortText.style.display = 'block';
+        void shortText.offsetWidth;
+        shortText.style.opacity = '1';
+        btn.dataset.animating = "false";
+      }, 500);
+
+      btn.textContent = "Ler Mais";
+    }
   };
 
   // News Modal Logic

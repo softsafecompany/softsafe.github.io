@@ -1915,3 +1915,44 @@ body.dark-mode .custom-dialog-input {
   border-color: #444;
   color: #fff;
 }
+
+/* News Expansion Animation */
+.short-text {
+  transition: opacity 0.2s ease-out;
+  opacity: 1;
+}
+
+.full-text {
+  overflow: hidden;
+  transition: height 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+/* Responsive Adjustments for News Page */
+@media (max-width: 768px) {
+  .news-section {
+    padding: 30px 20px;
+  }
+
+  .news-card {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .news-section {
+    padding: 20px 10px;
+  }
+
+  .news-card {
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  .news-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .news-search-container {
+    padding: 0 10px;
+  }
+}
