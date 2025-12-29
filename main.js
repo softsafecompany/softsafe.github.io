@@ -682,25 +682,42 @@ document.addEventListener("DOMContentLoaded", () => {
       const title = getLocalized(item, 'title');
       const text = getLocalized(item, 'text');
 
-      // Mostrar apenas 50% do texto no card
-      const truncatedText = text.length > 0 ? text.substring(0, Math.ceil(text.length / 2)) + "..." : "";
+      // Lógica de Expansão
+      const isLong = text.length > 150 || item.extra_image || item.extra_text;
+      const truncatedText = text.length > 150 ? text.substring(0, 150) + "..." : text;
 
       const extraText = getLocalized(item, 'extra_text');
+      let extraContentHTML = "";
+      if (item.extra_image) extraContentHTML += `<img src="${item.extra_image}" alt="Extra" style="margin-top:15px; width:100%; border-radius:8px;">`;
+      if (extraText) extraContentHTML += `<p style="margin-top:10px;">${extraText}</p>`;
 
-      let extraContent = "";
-      if (item.extra_image) extraContent += `<img src="${item.extra_image}" alt="Extra">`;
-      if (extraText) extraContent += `<p>${extraText}</p>`;
-      extraContent += `<button class="news-link-btn" onclick="openNewsModal(${item.id})">Saiba Mais</button>`;
+      let expandBtn = "";
+      if (isLong) {
+        expandBtn = `<button class="news-link-btn" id="news-btn-${item.id}" onclick="toggleNewsExpand(${item.id})">Ler Mais</button>`;
+      }
 
       card.innerHTML = `
         <h3>${title}</h3>
         ${item.date ? `<p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">📅 ${item.date}</p>` : ''}
         <img src="${item.image}" alt="${item.title}">
-        <p>${truncatedText}</p>
-        ${extraContent}
-        <button class="like-btn" onclick="toggleNewsLike(${item.id})" id="news-like-btn-${item.id}">
-          ❤️ <span id="news-like-count-${item.id}">0</span>
-        </button>
+        
+        <div id="news-content-${item.id}">
+            <p class="short-text">${truncatedText}</p>
+            <div class="full-text" style="display:none;">
+                <p>${text}</p>
+                ${extraContentHTML}
+            </div>
+        </div>
+        ${expandBtn}
+        
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="like-btn" onclick="toggleNewsLike(${item.id})" id="news-like-btn-${item.id}">
+            ❤️ <span id="news-like-count-${item.id}">0</span>
+          </button>
+          <button class="like-btn" onclick="openNewsModal(${item.id})">
+            💬 Comentários
+          </button>
+        </div>
       `;
 
       newsList.appendChild(card);
@@ -802,6 +819,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   }
+
+  // Função para expandir/colapsar texto da notícia
+  window.toggleNewsExpand = function (id) {
+    const content = document.getElementById(`news-content-${id}`);
+    const btn = document.getElementById(`news-btn-${id}`);
+    if (!content || !btn) return;
+
+    const shortText = content.querySelector('.short-text');
+    const fullText = content.querySelector('.full-text');
+
+    const isExpanded = fullText.style.display === "block";
+    shortText.style.display = isExpanded ? "block" : "none";
+    fullText.style.display = isExpanded ? "none" : "block";
+    btn.textContent = isExpanded ? "Ler Mais" : "Ler Menos";
+  };
 
   // News Modal Logic
   window.openNewsModal = function (id) {
@@ -1155,20 +1187,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Reading Progress Bar Logic
   window.addEventListener("scroll", () => {
-    if (!sobreSection || !progressBar) return;
-    const sectionTop = sobreSection.offsetTop;
-    const sectionHeight = sobreSection.offsetHeight;
-    const scrollTop = window.scrollY;
-    const windowHeight = window.innerHeight;
+    if (!progressBar) return;
 
-    const distance = scrollTop - sectionTop;
-    const total = sectionHeight - windowHeight;
-    let percentage = 0;
-
-    if (total > 0) {
-      percentage = (distance / total) * 100;
+    if (sobreSection) {
+      // Lógica para Index (baseada na seção Sobre)
+      const sectionTop = sobreSection.offsetTop;
+      const sectionHeight = sobreSection.offsetHeight;
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const distance = scrollTop - sectionTop;
+      const total = sectionHeight - windowHeight;
+      const percentage = total > 0 ? (distance / total) * 100 : 0;
+      progressBar.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
+    } else {
+      // Lógica para Novidades (baseada na página inteira)
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percentage = (scrollTop / docHeight) * 100;
+      progressBar.style.width = `${Math.min(100, percentage)}%`;
     }
-    progressBar.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
   });
 
   // Back to Top Logic
