@@ -479,7 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Product Logic (Only if productList exists)
-  function showSkeleton() {
+  function showSpinner() {
     if (!productList) return;
     productList.innerHTML = '<div class="main-spinner"></div>';
   }
@@ -616,7 +616,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Fetch product data with Cache
-  showSkeleton();
+  showSpinner();
 
   // Cache removido para garantir que alterações no JSON (links, preços) apareçam imediatamente
   localStorage.removeItem("softsafe_products_cache"); // Limpa cache antigo se existir
