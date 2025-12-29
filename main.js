@@ -75,6 +75,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const ratingCountElem = document.getElementById('rating-count');
   const privacyModal = document.getElementById("privacy-modal");
   const langToggleBtn = document.getElementById("lang-toggle");
+  const notificationBtn = document.getElementById("notification-btn");
+  const notificationDropdown = document.getElementById("notification-dropdown");
+  const notificationList = document.getElementById("notification-list");
+  const notificationCount = document.getElementById("notification-count");
+  const markAllReadBtn = document.getElementById("mark-all-read");
 
   // Inicializar currentLang no topo para evitar ReferenceError
   let currentLang = localStorage.getItem("softsafe_lang") || "pt";
@@ -261,6 +266,22 @@ document.addEventListener("DOMContentLoaded", () => {
       if (unsubscribeNotifications) {
         unsubscribeNotifications();
         unsubscribeNotifications = null;
+      }
+    }
+  });
+
+  // Notification UI Logic
+  if (notificationBtn) {
+    notificationBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      notificationDropdown.classList.toggle("active");
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (notificationDropdown && notificationDropdown.classList.contains("active")) {
+      if (!notificationDropdown.contains(e.target) && e.target !== notificationBtn) {
+        notificationDropdown.classList.remove("active");
       }
     }
   });
@@ -1126,23 +1147,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const q = query(
       collection(db, "notifications"),
       where("recipientId", "==", userId),
-      where("read", "==", false)
+      orderBy("timestamp", "desc")
     );
 
     unsubscribeNotifications = onSnapshot(q, (snapshot) => {
+      const notifications = [];
+      let unreadCount = 0;
+
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
           const notification = change.doc.data();
-          const notificationId = change.doc.id;
-
-          // Show a toast notification
-          showToast(notification.message, "success");
-
-          // Mark notification as read to prevent it from showing again
-          const notifRef = doc(db, "notifications", notificationId);
-          updateDoc(notifRef, { read: true });
+          // Only show toast if it's very recent (e.g., last 10 seconds) to avoid toast spam on load
+          const notifTime = notification.timestamp ? notification.timestamp.toDate() : new Date();
+          if (new Date() - notifTime < 10000 && !notification.read) {
+            showToast(notification.message, "success");
+          }
         }
       });
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        notifications.push({ id: doc.id, ...data });
+        if (!data.read) unreadCount++;
+      });
+
+      // Update Badge
+      if (notificationCount) {
+        notificationCount.textContent = unreadCount;
+        notificationCount.style.display = unreadCount > 0 ? "block" : "none";
+      }
+
+      // Render List
+      if (notificationList) {
+        notificationList.innerHTML = "";
+        if (notifications.length === 0) {
+          notificationList.innerHTML = '<div style="padding:10px; text-align:center; color:#888;">Nenhuma notificação.</div>';
+        } else {
+          notifications.forEach(notif => {
+            const div = document.createElement("div");
+            div.className = `notification-item ${notif.read ? '' : 'unread'}`;
+            div.textContent = notif.message;
+            div.onclick = () => {
+              // Mark as read
+              updateDoc(doc(db, "notifications", notif.id), { read: true });
+              // Open News Modal (if applicable)
+              if (notif.newsId) openNewsModal(parseInt(notif.newsId));
+            };
+            notificationList.appendChild(div);
+          });
+        }
+      }
+
+      if (markAllReadBtn) {
+        markAllReadBtn.onclick = () => {
+          notifications.forEach(n => {
+            if (!n.read) updateDoc(doc(db, "notifications", n.id), { read: true });
+          });
+        };
+      }
     });
   }
 
@@ -1356,23 +1418,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("scroll", () => {
     if (!progressBar) return;
 
-    if (sobreSection) {
-      // Lógica para Index (baseada na seção Sobre)
-      const sectionTop = sobreSection.offsetTop;
-      const sectionHeight = sobreSection.offsetHeight;
-      const scrollTop = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const distance = scrollTop - sectionTop;
-      const total = sectionHeight - windowHeight;
-      const percentage = total > 0 ? (distance / total) * 100 : 0;
-      progressBar.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
-    } else {
-      // Lógica para Novidades (baseada na página inteira)
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const percentage = (scrollTop / docHeight) * 100;
-      progressBar.style.width = `${Math.min(100, percentage)}%`;
-    }
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const percentage = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = `${Math.min(100, percentage)}%`;
   });
 
   // Back to Top Logic
