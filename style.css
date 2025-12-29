@@ -201,6 +201,17 @@ body {
   }
 }
 
+/* Prevent overlap on extremely small screens */
+@media (max-width: 370px) {
+  .logo h2 {
+    display: none;
+  }
+
+  .header {
+    padding: 10px;
+  }
+}
+
 @keyframes slideInRight {
   from {
     opacity: 0;
