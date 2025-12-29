@@ -322,25 +322,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Typewriter Effect for Hero Title
+  // Typewriter Logic (Encapsulated)
   const heroTitle = document.querySelector(".hero h2");
-  if (heroTitle) {
-    const text = heroTitle.textContent;
-    heroTitle.textContent = "";
+  let typewriterTimeout;
 
+  function startTypewriter(element, text) {
+    if (!element) return;
+    clearTimeout(typewriterTimeout);
+    element.textContent = "";
     const cursor = document.createElement("span");
     cursor.className = "typewriter-cursor";
-    heroTitle.appendChild(cursor);
+    element.appendChild(cursor);
 
     let i = 0;
-    function typeWriter() {
-      if (i < text.length) {
-        heroTitle.insertBefore(document.createTextNode(text.charAt(i)), cursor);
+    function type() {
+      if (i < text.length && cursor.parentNode === element) {
+        element.insertBefore(document.createTextNode(text.charAt(i)), cursor);
         i++;
-        setTimeout(typeWriter, 150); // Velocidade da digitação
+        typewriterTimeout = setTimeout(type, 150);
       }
     }
-    setTimeout(typeWriter, 500); // Atraso inicial
+    typewriterTimeout = setTimeout(type, 500);
   }
 
   // Scroll Indicator Logic
@@ -421,6 +423,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentOpenProductId = null;
   let currentMedia = [];
 
+  // Helper for localization
+  function getLocalized(data, key) {
+    if (!data || !key) return "";
+    const val = data[key];
+    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+      return val[currentLang] || val['pt'] || "";
+    }
+    return val;
+  }
+
   // Product Logic (Only if productList exists)
   function showSkeleton() {
     if (!productList) return;
@@ -469,11 +481,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       const isNew = !isNaN(diffDays) && diffDays >= 0 && diffDays <= 30;
 
+      const name = getLocalized(product, 'name');
       const productCard = `
           <div class="produto fade-in" style="animation-delay: ${index * 0.1}s">
             ${isNew ? '<span class="new-badge">Novo</span>' : ''}
             <img src="${product.image}" alt="${product.name}">
-            <h4>${product.name}</h4>
+            <h4>${name}</h4>
             <div class="product-views" id="product-views-${product.id}">
                👁️ <span class="view-count">0</span> visualizações
             </div>
@@ -621,11 +634,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (newsSearchInput) {
       newsSearchInput.addEventListener("input", (e) => {
         const term = e.target.value.toLowerCase();
-        filteredNews = allNews.filter(n =>
-          n.title.toLowerCase().includes(term) ||
-          n.text.toLowerCase().includes(term) ||
-          (n.extra_text && n.extra_text.toLowerCase().includes(term))
-        );
+        filteredNews = allNews.filter(n => {
+          const title = getLocalized(n, 'title').toLowerCase();
+          const text = getLocalized(n, 'text').toLowerCase();
+          const extra = getLocalized(n, 'extra_text') ? getLocalized(n, 'extra_text').toLowerCase() : "";
+          return title.includes(term) || text.includes(term) || extra.includes(term);
+        });
         currentNewsPage = 1;
         renderNewsBatch();
       });
@@ -651,16 +665,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "news-card";
 
+      const title = getLocalized(item, 'title');
+      const text = getLocalized(item, 'text');
+      const extraText = getLocalized(item, 'extra_text');
+
       let extraContent = "";
       if (item.extra_image) extraContent += `<img src="${item.extra_image}" alt="Extra">`;
-      if (item.extra_text) extraContent += `<p>${item.extra_text}</p>`;
+      if (extraText) extraContent += `<p>${extraText}</p>`;
       extraContent += `<button class="news-link-btn" onclick="openNewsModal(${item.id})">Saiba Mais</button>`;
 
       card.innerHTML = `
-        <h3>${item.title}</h3>
+        <h3>${title}</h3>
         ${item.date ? `<p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">📅 ${item.date}</p>` : ''}
         <img src="${item.image}" alt="${item.title}">
-        <p>${item.text}</p>
+        <p>${text}</p>
         ${extraContent}
         <button class="like-btn" onclick="toggleNewsLike(${item.id})" id="news-like-btn-${item.id}">
           ❤️ <span id="news-like-count-${item.id}">0</span>
@@ -772,7 +790,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const item = allNews.find(n => n.id === id);
     if (!item) return;
 
-    document.getElementById("news-modal-title").textContent = item.title;
+    document.getElementById("news-modal-title").textContent = getLocalized(item, 'title');
     document.getElementById("news-modal-date").textContent = item.date ? `📅 ${item.date}` : "";
 
     // Prepare Media
@@ -810,8 +828,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    let bodyContent = `<p style="margin-bottom: 15px;">${item.text}</p>`;
-    if (item.extra_text) bodyContent += `<p style="margin-bottom: 15px;">${item.extra_text}</p>`;
+    const text = getLocalized(item, 'text');
+    const extraText = getLocalized(item, 'extra_text');
+    let bodyContent = `<p style="margin-bottom: 15px;">${text}</p>`;
+    if (extraText) bodyContent += `<p style="margin-bottom: 15px;">${extraText}</p>`;
     if (currentNewsMedia.length <= 1 && item.extra_image && !item.image) bodyContent += `<img src="${item.extra_image}" style="width:100%; border-radius:8px; margin-top:10px;">`;
 
     document.getElementById("news-modal-body").innerHTML = bodyContent;
@@ -1061,24 +1081,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // Search functionality
   function performSearch() {
     const query = searchBar.value.toLowerCase();
-    const filteredProducts = allProducts.filter(product =>
-      product.name.toLowerCase().includes(query) ||
-      (product.description && product.description.toLowerCase().includes(query))
-    );
+    const filteredProducts = allProducts.filter(product => {
+      const name = getLocalized(product, 'name').toLowerCase();
+      const desc = getLocalized(product, 'description') ? getLocalized(product, 'description').toLowerCase() : "";
+      return name.includes(query) || desc.includes(query);
+    });
     renderProducts(filteredProducts);
 
     // Suggestions Logic
     if (suggestionsContainer) {
       suggestionsContainer.innerHTML = "";
       if (query.length > 0) {
-        const suggestions = allProducts.filter(p => p.name.toLowerCase().includes(query));
+        const suggestions = allProducts.filter(p => getLocalized(p, 'name').toLowerCase().includes(query));
         if (suggestions.length > 0) {
           suggestions.slice(0, 5).forEach(p => {
             const div = document.createElement("div");
+            const name = getLocalized(p, 'name');
             div.className = "suggestion-item";
-            div.textContent = p.name;
+            div.textContent = name;
             div.onclick = () => {
-              searchBar.value = p.name;
+              searchBar.value = name;
               suggestionsContainer.innerHTML = "";
               performSearch();
             };
@@ -1449,11 +1471,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Open modal with product details
   function openModal(product) {
     currentOpenProductId = product.id;
-    document.getElementById("modal-title").textContent = product.title;
+    document.getElementById("modal-title").textContent = getLocalized(product, 'title');
     document.getElementById("modal-size").textContent = product.size;
     document.getElementById("modal-version").textContent = product.version;
     document.getElementById("modal-compatibility").textContent = product.compatibility;
-    document.getElementById("modal-description").innerHTML = product.description.replace(/\n/g, '<br>');
+    document.getElementById("modal-description").innerHTML = getLocalized(product, 'description').replace(/\n/g, '<br>');
 
     // Incrementar contador de cliques (views) do produto no Firestore
     updateDoc(doc(db, "products", String(product.id)), { clicks: increment(1) }).catch(() => {
@@ -1512,7 +1534,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (shareActionBtn) {
       shareActionBtn.onclick = () => {
         const shareUrl = window.location.href;
-        const shareText = `Confira este software incrível: ${product.name}`;
+        const shareText = `Confira este software incrível: ${getLocalized(product, 'name')}`;
 
         // Update Links
         if (shareWhatsapp) shareWhatsapp.href = `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`;
@@ -1836,20 +1858,39 @@ document.addEventListener("DOMContentLoaded", () => {
     currentLang = lang;
     localStorage.setItem("softsafe_lang", lang);
 
-    // Update Button Text
-    if (langToggleBtn) langToggleBtn.textContent = lang === 'pt' ? "🇺🇸 EN" : "🇧🇷 PT";
+    // Add fade class to main content areas
+    const contentAreas = document.querySelectorAll("header, section, footer");
+    contentAreas.forEach(el => el.classList.add("lang-fade"));
 
-    // Update Text Content
-    document.querySelectorAll("[data-lang]").forEach(el => {
-      const key = el.getAttribute("data-lang");
-      if (translations[lang][key]) el.innerHTML = translations[lang][key];
-    });
+    setTimeout(() => {
+      // Update Button Text
+      if (langToggleBtn) langToggleBtn.textContent = lang === 'pt' ? "🇺🇸 EN" : "🇧🇷 PT";
 
-    // Update Placeholders
-    document.querySelectorAll("[data-lang-placeholder]").forEach(el => {
-      const key = el.getAttribute("data-lang-placeholder");
-      if (translations[lang][key]) el.placeholder = translations[lang][key];
-    });
+      // Update Text Content
+      document.querySelectorAll("[data-lang]").forEach(el => {
+        const key = el.getAttribute("data-lang");
+        if (translations[lang][key]) {
+          if (key === 'hero_title') {
+            startTypewriter(el, translations[lang][key]);
+          } else {
+            el.innerHTML = translations[lang][key];
+          }
+        }
+      });
+
+      // Update Placeholders
+      document.querySelectorAll("[data-lang-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-lang-placeholder");
+        if (translations[lang][key]) el.placeholder = translations[lang][key];
+      });
+
+      // Re-render dynamic content
+      if (allProducts.length > 0) renderProducts(allProducts);
+      if (allNews.length > 0) renderNewsBatch();
+
+      // Remove fade class
+      contentAreas.forEach(el => el.classList.remove("lang-fade"));
+    }, 300);
   }
 
   // Initialize Language

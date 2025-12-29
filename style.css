@@ -1668,6 +1668,11 @@ body.dark-mode .lang-toggle:hover {
   background-color: #444;
 }
 
+.lang-fade {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
 .news-search-btn {
   padding: 12px 25px;
   background-color: #1f4cff;
