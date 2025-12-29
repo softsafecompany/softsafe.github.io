@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
 // SUBSTITUA COM SUAS CREDENCIAIS REAIS DO CONSOLE DO FIREBASE
@@ -80,6 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const notificationList = document.getElementById("notification-list");
   const notificationCount = document.getElementById("notification-count");
   const markAllReadBtn = document.getElementById("mark-all-read");
+  const loginBtn = document.getElementById("login-btn");
+  const loginModal = document.getElementById("login-modal");
+  const closeLoginBtn = document.querySelector(".close-login");
+  const googleLoginBtn = document.getElementById("google-login-btn");
+  const logoutBtn = document.getElementById("logout-btn");
+  const profileName = document.getElementById("profile-name");
+  const profileEmail = document.getElementById("profile-email");
+  const profileImg = document.getElementById("profile-img");
 
   // Inicializar currentLang no topo para evitar ReferenceError
   let currentLang = localStorage.getItem("softsafe_lang") || "pt";
@@ -248,8 +256,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Lógica de Tema com Firebase ---
   onAuthStateChanged(auth, (user) => {
+    currentUser = user;
     if (user) {
-      currentUser = user;
       // Carregar tema salvo
       const userRef = doc(db, "users", user.uid);
       getDoc(userRef).then((docSnap) => {
@@ -260,15 +268,54 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       // Listen for notifications
       listenForNotifications(user.uid);
+
+      // Update Login Button Logic
+      if (!user.isAnonymous) {
+        // Logado com Google -> Botão Perfil
+        if (loginBtn) {
+          loginBtn.textContent = "Perfil";
+          loginBtn.onclick = () => window.location.href = 'perfil.html';
+        }
+
+        // Populate Profile Page
+        if (profileName) {
+          profileName.textContent = user.displayName || "Usuário";
+          if (profileEmail) profileEmail.textContent = user.email;
+          if (profileImg && user.photoURL) profileImg.src = user.photoURL;
+        }
+      } else {
+        // Usuário Anônimo -> Botão Login
+        if (loginBtn) {
+          loginBtn.textContent = "Login";
+          loginBtn.onclick = () => { if (loginModal) loginModal.style.display = "block"; };
+        }
+        // Redirect anonymous from profile
+        if (profileName) window.location.href = "index.html";
+      }
     } else {
-      // User signed out
-      currentUser = null;
       if (unsubscribeNotifications) {
         unsubscribeNotifications();
         unsubscribeNotifications = null;
       }
+      if (loginBtn) {
+        loginBtn.textContent = "Login";
+        loginBtn.onclick = () => { if (loginModal) loginModal.style.display = "block"; };
+      }
+      // Redirect logged out from profile
+      if (profileName) window.location.href = "index.html";
     }
   });
+
+  // Logout Logic
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      }).catch((error) => {
+        console.error("Erro ao sair:", error);
+      });
+    });
+  }
 
   // Notification UI Logic
   if (notificationBtn) {
@@ -1980,6 +2027,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (welcomeModal && welcomeModal.style.display === "block") closeWelcome();
       if (contactModal && contactModal.style.display === "block") closeModalWithFade(contactModal);
       if (privacyModal && privacyModal.style.display === "block") closeModalWithFade(privacyModal);
+      if (loginModal && loginModal.style.display === "block") closeModalWithFade(loginModal);
 
       // Close burger menu
       if (navMenu && navMenu.classList.contains("active")) {
@@ -2023,6 +2071,34 @@ document.addEventListener("DOMContentLoaded", () => {
     el.addEventListener("click", () => {
       if (privacyModal) closeModalWithFade(privacyModal);
     });
+  });
+
+  // Login Modal Logic
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener("click", () => {
+      if (loginModal) closeModalWithFade(loginModal);
+    });
+  }
+
+  if (googleLoginBtn) {
+    googleLoginBtn.addEventListener("click", () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          showToast("Login realizado com sucesso!", "success");
+          if (loginModal) closeModalWithFade(loginModal);
+        })
+        .catch((error) => {
+          console.error("Erro no login:", error);
+          showToast("Erro ao fazer login.", "error");
+        });
+    });
+  }
+
+  window.addEventListener("click", (event) => {
+    if (event.target == loginModal) {
+      closeModalWithFade(loginModal);
+    }
   });
 
   // Close privacy modal on outside click (handled by generic window click listener below)

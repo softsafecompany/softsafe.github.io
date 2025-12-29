@@ -1772,8 +1772,9 @@ body.dark-mode .faq-answer p {
 /* Language Toggle Button */
 .lang-toggle {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  bottom: 230px;
+  right: 20px;
+  left: auto;
   background-color: #fff;
   color: #333;
   border: 1px solid #ddd;
@@ -2180,7 +2181,8 @@ body.dark-mode .custom-dialog-input {
 }
 
 .close-privacy,
-.close-contact {
+.close-contact,
+.close-login {
   position: absolute;
   top: 20px;
   right: 25px;
@@ -2237,4 +2239,108 @@ body.dark-mode .custom-dialog-input {
   height: 50px;
   animation: spin 1s linear infinite;
   margin: 50px auto;
+}
+
+/* Theme Toggle Float - Adding missing style */
+.theme-toggle-float {
+  position: fixed;
+  bottom: 160px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-float:hover {
+  transform: scale(1.1);
+}
+
+body.dark-mode .theme-toggle-float {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* Floating Entrance Animation */
+@keyframes floatEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.whatsapp-float,
+.theme-toggle-float,
+.back-to-top,
+.lang-toggle {
+  animation: floatEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.whatsapp-float {
+  animation-delay: 0.2s;
+}
+
+.theme-toggle-float {
+  animation-delay: 0.3s;
+}
+
+.back-to-top {
+  animation-delay: 0.4s;
+}
+
+.lang-toggle {
+  animation-delay: 0.5s;
+}
+
+/* Small Screens - Reduce Floating Buttons to ~60% */
+@media (max-width: 600px) {
+  .whatsapp-float {
+    width: 36px;
+    height: 36px;
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .whatsapp-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .back-to-top {
+    width: 30px;
+    height: 30px;
+    right: 10px;
+    bottom: 55px;
+    font-size: 0.8rem;
+  }
+
+  .theme-toggle-float {
+    width: 30px;
+    height: 30px;
+    right: 10px;
+    bottom: 95px;
+    font-size: 0.9rem;
+  }
+
+  .lang-toggle {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    right: 10px;
+    bottom: 135px;
+  }
 }
