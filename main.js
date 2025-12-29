@@ -51,9 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const progressBar = document.getElementById("progress-bar");
   const sobreSection = document.getElementById("sobre");
   const backToTopBtn = document.getElementById("back-to-top");
-  const welcomeModal = document.getElementById("welcome-modal");
-  const closeWelcomeBtn = document.querySelector(".close-welcome");
-  const acceptWelcomeBtn = document.getElementById("accept-welcome");
   const burgerMenu = document.getElementById("burger-menu");
   const navMenu = document.getElementById("nav-menu");
   const menuOverlay = document.getElementById("menu-overlay");
@@ -1508,23 +1505,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Welcome Modal Logic (Cookie/LocalStorage)
-  if (welcomeModal && !localStorage.getItem("softsafe_welcome_seen")) {
-    setTimeout(() => {
-      welcomeModal.style.display = "block";
-    }, 1000);
-  }
-
-  function closeWelcome() {
-    if (welcomeModal) {
-      welcomeModal.style.display = "none";
-      localStorage.setItem("softsafe_welcome_seen", "true");
-    }
-  }
-
-  if (closeWelcomeBtn) closeWelcomeBtn.addEventListener("click", closeWelcome);
-  if (acceptWelcomeBtn) acceptWelcomeBtn.addEventListener("click", closeWelcome);
-
   // Carousel Logic
   function renderCarousel() {
     if (!carouselInner) return;
@@ -2000,9 +1980,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target == newsModal) {
       closeModalWithFade(newsModal);
     }
-    if (event.target == welcomeModal) {
-      closeWelcome();
-    }
     if (event.target == privacyModal) {
       closeModalWithFade(privacyModal);
     }
@@ -2024,7 +2001,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (zoomModal && zoomModal.style.display === "block") closeModalWithFade(zoomModal);
       if (shareModal && shareModal.style.display === "block") closeModalWithFade(shareModal);
       if (newsModal && newsModal.style.display === "block") closeModalWithFade(newsModal);
-      if (welcomeModal && welcomeModal.style.display === "block") closeWelcome();
       if (contactModal && contactModal.style.display === "block") closeModalWithFade(contactModal);
       if (privacyModal && privacyModal.style.display === "block") closeModalWithFade(privacyModal);
       if (loginModal && loginModal.style.display === "block") closeModalWithFade(loginModal);
@@ -2183,8 +2159,6 @@ document.addEventListener("DOMContentLoaded", () => {
       btn_copy_link: "Copiar Link",
       privacy_title: "Política de Privacidade",
       btn_understood: "Entendi",
-      welcome_title: "Bem-vindo à SoftSafe!",
-      welcome_text: "Descubra ferramentas profissionais para levar seu sistema ao próximo nível.",
       contact_title: "Fale Conosco",
       contact_name_ph: "Seu Nome",
       contact_email_ph: "Seu Email",
@@ -2216,8 +2190,6 @@ document.addEventListener("DOMContentLoaded", () => {
       btn_copy_link: "Copy Link",
       privacy_title: "Privacy Policy",
       btn_understood: "Got it",
-      welcome_title: "Welcome to SoftSafe!",
-      welcome_text: "Discover professional tools to take your system to the next level.",
       contact_title: "Contact Us",
       contact_name_ph: "Your Name",
       contact_email_ph: "Your Email",

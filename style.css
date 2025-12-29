@@ -2197,10 +2197,6 @@ body.dark-mode .custom-dialog-input {
   padding-right: 10px;
 }
 
-#accept-welcome {
-  margin-top: 15px;
-}
-
 /* Desktop Header Alignment */
 @media (min-width: 829px) {
   .header {
