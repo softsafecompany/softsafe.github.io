@@ -75,6 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const privacyModal = document.getElementById("privacy-modal");
   const langToggleBtn = document.getElementById("lang-toggle");
 
+  // Inicializar currentLang no topo para evitar ReferenceError
+  let currentLang = localStorage.getItem("softsafe_lang") || "pt";
+
   // --- Custom Alert & Prompt System ---
   // Injeta o HTML do modal de alerta no corpo da página
   const customDialogHTML = `
@@ -141,6 +144,16 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     });
   };
+
+  // --- Translation Indicator ---
+  const transIndicatorHTML = `
+    <div id="translation-indicator" style="display:none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(31, 76, 255, 0.9); color:white; padding:10px 20px; border-radius:25px; z-index:9999; font-weight:600; box-shadow:0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(5px);">
+      <span style="display:inline-block; animation:spin 1s linear infinite; margin-right:8px;">⟳</span> <span id="trans-text">Traduzindo conteúdo...</span>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', transIndicatorHTML);
+  const transIndicator = document.getElementById("translation-indicator");
+  const transLabel = document.getElementById("trans-text");
 
   // --- Toast Notification Logic ---
   function showToast(message, type = 'info') {
@@ -336,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let i = 0;
     function type() {
-      if (i < text.length && cursor.parentNode === element) {
+      if (element && cursor.parentNode === element && i < text.length) {
         element.insertBefore(document.createTextNode(text.charAt(i)), cursor);
         i++;
         typewriterTimeout = setTimeout(type, 150);
@@ -424,13 +437,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentMedia = [];
 
   // Helper for localization
+  // Agora suporta tradução automática armazenada em propriedades _en
   function getLocalized(data, key) {
     if (!data || !key) return "";
-    const val = data[key];
-    if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
-      return val[currentLang] || val['pt'] || "";
+    if (currentLang === 'en' && data[key + '_en']) {
+      return data[key + '_en'];
     }
-    return val;
+    // Fallback para o texto original (PT)
+    return data[key] || "";
   }
 
   // Product Logic (Only if productList exists)
@@ -1852,15 +1866,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  let currentLang = localStorage.getItem("softsafe_lang") || "pt";
+  // Função de tradução automática (Google GTX)
+  async function translateText(text, targetLang) {
+    if (!text) return "";
+    try {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=pt&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      // Google GTX retorna array de sentenças
+      if (json && json[0]) {
+        return json[0].map(x => x[0]).join("");
+      }
+      return text;
+    } catch (e) {
+      console.error("Translation error", e);
+      return text;
+    }
+  }
 
-  function updateLanguage(lang) {
+  // Traduzir dataset inteiro
+  async function translateDataset(data, fields, targetLang) {
+    const promises = data.map(async (item) => {
+      for (const field of fields) {
+        const targetKey = field + '_' + targetLang;
+        if (item[field] && !item[targetKey]) {
+          item[targetKey] = await translateText(item[field], targetLang);
+        }
+      }
+    });
+    await Promise.all(promises);
+  }
+
+  async function updateLanguage(lang) {
     currentLang = lang;
     localStorage.setItem("softsafe_lang", lang);
 
     // Add fade class to main content areas
     const contentAreas = document.querySelectorAll("header, section, footer");
     contentAreas.forEach(el => el.classList.add("lang-fade"));
+
+    // Se mudar para inglês, traduzir conteúdo dinâmico
+    if (lang === 'en') {
+      // Mostrar indicador
+      if (transIndicator) {
+        transIndicator.style.display = "block";
+        transLabel.textContent = "Translating content...";
+      }
+
+      if (allProducts.length > 0) {
+        await translateDataset(allProducts, ['name', 'title', 'description'], 'en');
+      }
+      if (allNews.length > 0) {
+        await translateDataset(allNews, ['title', 'text', 'extra_text'], 'en');
+      }
+      // Ocultar indicador
+      if (transIndicator) transIndicator.style.display = "none";
+    }
 
     setTimeout(() => {
       // Update Button Text

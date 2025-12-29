@@ -2,53 +2,29 @@
     {
         "id": 1,
         "date": "25/12/2025",
-        "title": {
-            "pt": "Criação do SoftSafe Company",
-            "en": "Creation of SoftSafe Company"
-        },
+        "title": "Criação do SoftSafe Company",
         "image": "assets/softsafe.png",
-        "text": {
-            "pt": "Estamos orgulhosos em anunciar a fundação da SoftSafe Company, dedicada a desenvolver soluções de software inovadoras, que priorizam a segurança e a privacidade dos usuários. Nossa missão é fornecer ferramentas poderosas que funcionam 100% offline, garantindo que seus dados permaneçam sempre sob seu controle. \n Junte-se a nós nesta jornada para tornar o mundo digital um lugar mais seguro.",
-            "en": "We are proud to announce the founding of SoftSafe Company, dedicated to developing innovative software solutions that prioritize user security and privacy. Our mission is to provide powerful tools that work 100% offline, ensuring your data remains under your control. \n Join us on this journey to make the digital world a safer place."
-        },
+        "text": "Estamos orgulhosos em anunciar a fundação da SoftSafe Company, dedicada a desenvolver soluções de software inovadoras, que priorizam a segurança e a privacidade dos usuários. Nossa missão é fornecer ferramentas poderosas que funcionam 100% offline, garantindo que seus dados permaneçam sempre sob seu controle. \n Junte-se a nós nesta jornada para tornar o mundo digital um lugar mais seguro.",
         "extra_image": "assets/product.png",
-        "extra_text": {
-            "pt": "Confira as notas de atualização completas no nosso portal.",
-            "en": "Check out the full release notes on our portal."
-        },
+        "extra_text": "Confira as notas de atualização completas no nosso portal.",
         "link": "#"
     },
     {
         "id": 2,
         "date": "15/05/2025",
-        "title": {
-            "pt": "Lançamento SoftSafe 2.0",
-            "en": "SoftSafe 2.0 Launch"
-        },
+        "title": "Lançamento SoftSafe 2.0",
         "image": "assets/product.png",
-        "text": {
-            "pt": "Estamos orgulhosos em anunciar a nova versão do nosso software principal. Com melhorias de performance e novas funcionalidades de IA, o SoftSafe 2.0 redefine o que é possível fazer offline.",
-            "en": "We are proud to announce the new version of our flagship software. With performance improvements and new AI features, SoftSafe 2.0 redefines what is possible offline."
-        },
+        "text": "Estamos orgulhosos em anunciar a nova versão do nosso software principal. Com melhorias de performance e novas funcionalidades de IA, o SoftSafe 2.0 redefine o que é possível fazer offline.",
         "extra_image": "assets/product.png",
-        "extra_text": {
-            "pt": "Confira as notas de atualização completas no nosso portal.",
-            "en": "Check out the full release notes on our portal."
-        },
+        "extra_text": "Confira as notas de atualização completas no nosso portal.",
         "link": "#"
     },
     {
         "id": 3,
         "date": "10/05/2025",
-        "title": {
-            "pt": "Dicas de Segurança",
-            "en": "Security Tips"
-        },
+        "title": "Dicas de Segurança",
         "image": "assets/product.png",
-        "text": {
-            "pt": "Mantenha seu sistema seguro com nossas novas ferramentas de monitoramento em tempo real. A prevenção é a melhor defesa.",
-            "en": "Keep your system safe with our new real-time monitoring tools. Prevention is the best defense."
-        },
+        "text": "Mantenha seu sistema seguro com nossas novas ferramentas de monitoramento em tempo real. A prevenção é a melhor defesa.",
         "link": "https://google.com"
     }
 ]

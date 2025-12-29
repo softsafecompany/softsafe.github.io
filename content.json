@@ -1,23 +1,14 @@
 [
   {
     "id": 1,
-    "name": {
-      "pt": "Removedor de fundo suave",
-      "en": "Soft Background Remover"
-    },
+    "name": "Removedor de fundo suave",
     "date": "2025-05-20",
     "image": "assets/product.png",
-    "title": {
-      "pt": "Removedor de fundo suave",
-      "en": "Soft Background Remover"
-    },
+    "title": "Removedor de fundo suave",
     "size": "150 MB",
     "version": "1.3.2",
     "compatibility": "Windows 10/11",
-    "description": {
-      "pt": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
-      "en": "Soft Background Remover is an advanced tool that uses AI technology to remove image backgrounds effortlessly. \n Perfect for creating professional-looking photos for e-commerce, social media, and more. \n It works 100% offline, ensuring your data privacy without needing an internet connection. \n With an intuitive interface, you can easily upload your images, adjust settings, and save results in various formats. Try Soft Background Remover and transform your photos with ease and safety.\n\n🎨 FEATURES\n\nHOME SCREEN:\n\n ✅ Background color selection \n ✅ Batch processing\n✅ Update check\n✅ Drag & Drop files\n✅ Log cleaning\n✅ \"About\" window\n\nEDITOR:\n✅ 🤖 Auto Remove (AI)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser\n✅ ✏️ Pencil (restorer)\n✅ ✋ Pan Mode\n✅ 🔁 Rotate\n✅ 🪢 Lasso (free selection)\n✅ 🔄 Invert Mask\n✅ 🖥️ Fullscreen\n\nCONTROLS:\n✅ Size slider (5-150px)\n✅ Hardness control (1-100%)\n✅ Zoom with mouse wheel (10%-500%)\n✅ Undo/Redo (up to 15 states)\n✅ Customizable shortcuts\n\nSTATUS: ✅ 100% FUNCTIONAL"
-    },
+    "description": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
     "download_link": "#",
     "media": [
       {
@@ -36,65 +27,38 @@
   },
   {
     "id": 2,
-    "name": {
-      "pt": "cc",
-      "en": "cc"
-    },
+    "name": "cc",
     "date": "2025-05-18",
     "image": "assets/product.png",
-    "title": {
-      "pt": "Removedor de fundo suave",
-      "en": "Soft Background Remover"
-    },
+    "title": "Removedor de fundo suave",
     "size": "150 MB",
     "version": "1.3.2",
     "compatibility": "Windows 10/11",
-    "description": {
-      "pt": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
-      "en": "Soft Background Remover is an advanced tool that uses AI technology to remove image backgrounds effortlessly. \n Perfect for creating professional-looking photos for e-commerce, social media, and more. \n It works 100% offline, ensuring your data privacy without needing an internet connection. \n With an intuitive interface, you can easily upload your images, adjust settings, and save results in various formats. Try Soft Background Remover and transform your photos with ease and safety.\n\n🎨 FEATURES\n\nHOME SCREEN:\n\n ✅ Background color selection \n ✅ Batch processing\n✅ Update check\n✅ Drag & Drop files\n✅ Log cleaning\n✅ \"About\" window\n\nEDITOR:\n✅ 🤖 Auto Remove (AI)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser\n✅ ✏️ Pencil (restorer)\n✅ ✋ Pan Mode\n✅ 🔁 Rotate\n✅ 🪢 Lasso (free selection)\n✅ 🔄 Invert Mask\n✅ 🖥️ Fullscreen\n\nCONTROLS:\n✅ Size slider (5-150px)\n✅ Hardness control (1-100%)\n✅ Zoom with mouse wheel (10%-500%)\n✅ Undo/Redo (up to 15 states)\n✅ Customizable shortcuts\n\nSTATUS: ✅ 100% FUNCTIONAL"
-    },
+    "description": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
     "download_link": "#"
   },
   {
     "id": 3,
-    "name": {
-      "pt": "Removedor",
-      "en": "Remover"
-    },
+    "name": "Removedor",
     "date": "2025-04-10",
     "image": "assets/product.png",
-    "title": {
-      "pt": "Removedor de fundo suave",
-      "en": "Soft Background Remover"
-    },
+    "title": "Removedor de fundo suave",
     "size": "150 MB",
     "version": "1.3.2",
     "compatibility": "Windows 10/11",
-    "description": {
-      "pt": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
-      "en": "Soft Background Remover is an advanced tool that uses AI technology to remove image backgrounds effortlessly. \n Perfect for creating professional-looking photos for e-commerce, social media, and more. \n It works 100% offline, ensuring your data privacy without needing an internet connection. \n With an intuitive interface, you can easily upload your images, adjust settings, and save results in various formats. Try Soft Background Remover and transform your photos with ease and safety.\n\n🎨 FEATURES\n\nHOME SCREEN:\n\n ✅ Background color selection \n ✅ Batch processing\n✅ Update check\n✅ Drag & Drop files\n✅ Log cleaning\n✅ \"About\" window\n\nEDITOR:\n✅ 🤖 Auto Remove (AI)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser\n✅ ✏️ Pencil (restorer)\n✅ ✋ Pan Mode\n✅ 🔁 Rotate\n✅ 🪢 Lasso (free selection)\n✅ 🔄 Invert Mask\n✅ 🖥️ Fullscreen\n\nCONTROLS:\n✅ Size slider (5-150px)\n✅ Hardness control (1-100%)\n✅ Zoom with mouse wheel (10%-500%)\n✅ Undo/Redo (up to 15 states)\n✅ Customizable shortcuts\n\nSTATUS: ✅ 100% FUNCTIONAL"
-    },
+    "description": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
     "download_link": "#"
   },
   {
     "id": 4,
-    "name": {
-      "pt": "fundo suave",
-      "en": "soft background"
-    },
+    "name": "fundo suave",
     "date": "2025-01-15",
     "image": "assets/product.png",
-    "title": {
-      "pt": "Removedor de fundo suave",
-      "en": "Soft Background Remover"
-    },
+    "title": "Removedor de fundo suave",
     "size": "150 MB",
     "version": "1.3.2",
     "compatibility": "Windows 10/11",
-    "description": {
-      "pt": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
-      "en": "Soft Background Remover is an advanced tool that uses AI technology to remove image backgrounds effortlessly. \n Perfect for creating professional-looking photos for e-commerce, social media, and more. \n It works 100% offline, ensuring your data privacy without needing an internet connection. \n With an intuitive interface, you can easily upload your images, adjust settings, and save results in various formats. Try Soft Background Remover and transform your photos with ease and safety.\n\n🎨 FEATURES\n\nHOME SCREEN:\n\n ✅ Background color selection \n ✅ Batch processing\n✅ Update check\n✅ Drag & Drop files\n✅ Log cleaning\n✅ \"About\" window\n\nEDITOR:\n✅ 🤖 Auto Remove (AI)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser\n✅ ✏️ Pencil (restorer)\n✅ ✋ Pan Mode\n✅ 🔁 Rotate\n✅ 🪢 Lasso (free selection)\n✅ 🔄 Invert Mask\n✅ 🖥️ Fullscreen\n\nCONTROLS:\n✅ Size slider (5-150px)\n✅ Hardness control (1-100%)\n✅ Zoom with mouse wheel (10%-500%)\n✅ Undo/Redo (up to 15 states)\n✅ Customizable shortcuts\n\nSTATUS: ✅ 100% FUNCTIONAL"
-    },
+    "description": "O Soft Background Remover é uma ferramenta avançada que utiliza tecnologia de IA para remover fundos de imagens sem esforço. \n Perfeito para criar fotos com aparência profissional para e-commerce, redes sociais e muito mais. \n Ele funciona 100% offline, garantindo a privacidade dos seus dados sem necessidade de conexão com a internet. \n Com uma interface intuitiva, você pode facilmente carregar suas imagens, ajustar configurações e salvar os resultados em diversos formatos. Experimente o Soft Background Remover e transforme suas fotos com facilidade e segurança.\n\n🎨 FUNCIONALIDADES\n\nHOME SCREEN:\n\n ✅ Seleção de cor de fundo \n ✅ Processamento em lote\n✅ Verificação de atualizações\n✅ Drag & Drop de arquivos\n✅ Limpeza de logs\n✅ Janela \"Sobre\"\n\nEDITOR:\n✅ 🤖 Auto Remove (IA)\n✅ ✨ Magic Erase (flood fill)\n✅ 🗑️ Eraser (borracha)\n✅ ✏️ Pencil (restaurador)\n✅ ✋ Pan Mode (mover)\n✅ 🔁 Rotate (girar)\n✅ 🪢 Lasso (seleção livre)\n✅ 🔄 Invert Mask (inverter)\n✅ 🖥️ Fullscreen (tela cheia / Mover header pra baixo)\n\nCONTROLES:\n✅ Slider de tamanho (5-150px)\n✅ Controle de dureza (1-100%)\n✅ Zoom com mouse wheel (10%-500%)\n✅ Undo/Redo (até 15 estados)\n✅ Atalhos personalizáveis\n\nSTATUS: ✅ 100% FUNCIONAL",
     "download_link": "#"
   }
 ]
