@@ -1439,6 +1439,21 @@ body.dark-mode .news-search-input {
   color: #fff;
 }
 
+.news-search-btn {
+  padding: 12px 25px;
+  background-color: #1f4cff;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.news-search-btn:hover {
+  background-color: #3a66ff;
+}
+
 /* Product Views Counter */
 .product-views {
   display: flex;

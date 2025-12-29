@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const newsNext = document.getElementById("news-carousel-next");
   const newsDots = document.getElementById("news-carousel-dots");
   const newsSearchInput = document.getElementById("news-search-input");
+  const newsSearchBtn = document.getElementById("news-search-btn");
   const contactModal = document.getElementById("contact-modal");
   const closeContactBtn = document.querySelector(".close-contact");
   const contactForm = document.getElementById("contact-form");
@@ -524,6 +525,14 @@ document.addEventListener("DOMContentLoaded", () => {
         renderNewsBatch();
       });
     }
+
+    if (newsSearchBtn && newsSearchInput) {
+      newsSearchBtn.addEventListener("click", () => {
+        // Disparar evento de input para reaproveitar a lógica de filtro existente
+        const event = new Event('input');
+        newsSearchInput.dispatchEvent(event);
+      });
+    }
   }
 
   function renderNewsBatch() {
@@ -768,15 +777,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const statsRef = doc(db, "news_stats", String(id));
 
     getDoc(likeRef).then((docSnap) => {
-      if (docSnap.exists()) {
+      const isLiked = docSnap.exists() && docSnap.data().active;
+
+      if (isLiked) {
         // Remover Like
-        setDoc(likeRef, { active: false }); // Ou deleteDoc
-        updateDoc(statsRef, { likesCount: increment(-1) });
+        updateDoc(likeRef, { active: false });
+        setDoc(statsRef, { likesCount: increment(-1) }, { merge: true });
         document.getElementById(`news-like-btn-${id}`).classList.remove("liked");
       } else {
         // Adicionar Like
-        setDoc(likeRef, { active: true });
-        updateDoc(statsRef, { likesCount: increment(1) });
+        setDoc(likeRef, { active: true }); // Cria ou sobrescreve
+        setDoc(statsRef, { likesCount: increment(1) }, { merge: true });
         document.getElementById(`news-like-btn-${id}`).classList.add("liked");
       }
     });
@@ -1320,7 +1331,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Helper function to close modal with fade out
-  function closeModalWithFade(modalElement, callback) {
+  window.closeModalWithFade = function (modalElement, callback) {
     if (!modalElement) return;
     modalElement.classList.add("fade-out");
     setTimeout(() => {
@@ -1328,7 +1339,7 @@ document.addEventListener("DOMContentLoaded", () => {
       modalElement.classList.remove("fade-out");
       if (callback) callback();
     }, 300); // Match animation duration
-  }
+  };
 
   // Open modal with product details
   function openModal(product) {
@@ -1467,6 +1478,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const currentAvg = data.averageRating || 0;
             const currentCount = data.ratingCount || 0;
 
+            // Verificação para impedir múltiplas avaliações (mesmo que as regras permitam update)
+            if (userRatingDoc.exists()) {
+              throw "Você já avaliou este produto.";
+            }
+
             if (userRatingDoc.exists()) {
               const oldRating = userRatingDoc.data().rating;
               newRatingCount = currentCount;
@@ -1482,7 +1498,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
           }
           transaction.set(userRatingRef, { rating: rating, timestamp: new Date() });
-        }).then(() => console.log("Avaliação salva!")).catch(err => console.error("Erro ao avaliar:", err));
+        }).then(() => {
+          console.log("Avaliação salva!");
+          alert("Obrigado pela sua avaliação!");
+        }).catch(err => alert(err));
       });
     });
   }
