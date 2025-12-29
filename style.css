@@ -2400,12 +2400,6 @@ body.dark-mode .theme-toggle-float {
   align-items: center;
 }
 
-.activity-list {
-  text-align: left;
-  display: inline-block;
-  width: 100%;
-}
-
 /* Auth Modal Styles */
 .auth-tabs {
   display: flex;
