@@ -10,5 +10,21 @@
     {
         "question": "Como faço para atualizar?",
         "answer": "O próprio software possui um verificador de atualizações integrado na tela inicial. Basta clicar em \"Verificar atualizações\"."
+    },
+    {
+        "question": "posso usar o software para fins comerciais?",
+        "answer": " Sim, nossos softwares podem ser utilizados para fins comerciais. Recomendamos revisar os termos de uso específicos para cada produto."
+    },
+    {
+        "question": "Onde posso encontrar suporte técnico?",
+        "answer": "Oferecemos suporte técnico através do nosso site oficial. Visite a seção de suporte para obter ajuda e recursos adicionais."
+    },
+    {
+        "question": "Quais formatos de arquivo são suportados?",
+        "answer": "Nossos softwares suportam uma ampla variedade de formatos de arquivo. Consulte a documentação do produto para obter uma lista completa dos formatos compatíveis."
+    },
+    {
+        "question": "Existe uma versão de teste disponível?",
+        "answer": "Sim, oferecemos versões de teste gratuitas para que você possa experimentar nossos softwares antes de fazer uma compra."
     }
 ]
