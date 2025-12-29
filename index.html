@@ -276,12 +276,58 @@
     <div id="login-modal" class="modal">
       <div class="modal-content" style="max-width: 400px; text-align: center">
         <span class="close-login">&times;</span>
-        <h2>Bem-vindo</h2>
-        <p>Faça login para acessar seu perfil e recursos exclusivos.</p>
+        <div class="auth-tabs">
+          <button id="tab-login" class="auth-tab active">Login</button>
+          <button id="tab-signup" class="auth-tab">Criar Conta</button>
+        </div>
+
+        <div id="form-login" class="auth-form">
+          <input type="email" id="login-email" placeholder="E-mail" required />
+          <input type="password" id="login-pass" placeholder="Senha" required />
+          <button
+            id="manual-login-btn"
+            class="download-btn"
+            style="width: 100%"
+          >
+            Entrar
+          </button>
+        </div>
+
+        <div id="form-signup" class="auth-form" style="display: none">
+          <input type="email" id="signup-email" placeholder="E-mail" required />
+          <input
+            type="password"
+            id="signup-pass"
+            placeholder="Senha"
+            required
+          />
+          <input
+            type="password"
+            id="signup-confirm"
+            placeholder="Confirmar Senha"
+            required
+          />
+          <input type="number" id="signup-age" placeholder="Idade" required />
+          <input type="text" id="signup-country" placeholder="País" required />
+          <label style="text-align: left; font-size: 0.9rem"
+            >Foto de Perfil:</label
+          >
+          <input type="file" id="signup-photo" accept="image/*" />
+          <button
+            id="manual-signup-btn"
+            class="download-btn"
+            style="width: 100%"
+          >
+            Criar Conta
+          </button>
+        </div>
+
+        <div class="auth-separator"><span>OU</span></div>
+
         <button
           id="google-login-btn"
           class="download-btn"
-          style="background-color: #db4437; width: 100%; margin-top: 20px"
+          style="background-color: #db4437; width: 100%"
         >
           <i class="fab fa-google" style="margin-right: 10px"></i> Entrar com
           Google

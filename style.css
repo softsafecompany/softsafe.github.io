@@ -2382,3 +2382,119 @@ body.dark-mode .theme-toggle-float {
 .edit-btn:hover {
   color: #1f4cff;
 }
+
+/* Profile Page Centering */
+.profile-container {
+  text-align: center;
+}
+
+.profile-header {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.profile-header>div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.activity-list {
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Auth Modal Styles */
+.auth-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.auth-tab {
+  background: none;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.auth-tab.active {
+  color: #1f4cff;
+  border-bottom: 2px solid #1f4cff;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-form input,
+.auth-form select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+}
+
+body.dark-mode .auth-form input,
+body.dark-mode .auth-form select {
+  background-color: #252525;
+  border-color: #444;
+  color: #fff;
+}
+
+.auth-separator {
+  margin: 20px 0;
+  border-top: 1px solid #eee;
+  position: relative;
+}
+
+.auth-separator span {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e1e2e3;
+  padding: 0 10px;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+body.dark-mode .auth-separator span {
+  background: #1e1e1e;
+  /* Match dark modal bg */
+}
+
+/* Full Screen Spinner */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 20000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: white;
+}
+
+.loading-spinner {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #1f4cff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}

@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, setPersistence, browserLocalPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
 // SUBSTITUA COM SUAS CREDENCIAIS REAIS DO CONSOLE DO FIREBASE
@@ -93,6 +93,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileUpload = document.getElementById("profile-upload");
   const editNameBtn = document.getElementById("edit-name-btn");
 
+  // Auth Elements
+  const tabLogin = document.getElementById("tab-login");
+  const tabSignup = document.getElementById("tab-signup");
+  const formLogin = document.getElementById("form-login");
+  const formSignup = document.getElementById("form-signup");
+  const manualLoginBtn = document.getElementById("manual-login-btn");
+  const manualSignupBtn = document.getElementById("manual-signup-btn");
+  const signupPhoto = document.getElementById("signup-photo");
+  const signupPhotoPreview = document.getElementById("signup-photo-preview");
+
   // Inicializar currentLang no topo para evitar ReferenceError
   let currentLang = localStorage.getItem("softsafe_lang") || "pt";
 
@@ -173,6 +183,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const transIndicator = document.getElementById("translation-indicator");
   const transLabel = document.getElementById("trans-text");
 
+  // --- Loading Overlay ---
+  const loadingOverlayHTML = `
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Processando...</p>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', loadingOverlayHTML);
+  const loadingOverlay = document.getElementById("loading-overlay");
+  const toggleLoading = (show) => { if (loadingOverlay) loadingOverlay.style.display = show ? 'flex' : 'none'; };
+
   // --- Toast Notification Logic ---
   function showToast(message, type = 'info') {
     let toast = document.getElementById("toast-notification");
@@ -202,15 +223,22 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Verificar resultado do login por redirecionamento (Correção para erro de Popup/COOP)
+  toggleLoading(true);
   getRedirectResult(auth)
     .then((result) => {
       if (result) {
+        toggleLoading(false);
         showToast("Login realizado com sucesso!", "success");
       }
     })
     .catch((error) => {
+      toggleLoading(false);
       console.error("Erro no login por redirecionamento:", error);
-      showToast("Erro ao fazer login.", "error");
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        showToast("Conta já existe com credencial diferente.", "error");
+      } else if (error.code !== 'auth/user-cancelled') {
+        showToast("Erro ao fazer login.", "error");
+      }
     });
 
   // --- Contact Modal Logic ---
@@ -311,7 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (profileName) window.location.href = "index.html";
       }
     } else {
-      // Se nenhum usuário estiver logado (nem Google, nem Anônimo), autenticar anonimamente
+      // Se nenhum usuário estiver logado (nem Google, nem Anônimo), autenticar anonimamente (apenas se não estiver na página de perfil)
       signInAnonymously(auth).catch((error) => {
         console.error("Erro Auth:", error);
       });
@@ -328,6 +356,145 @@ document.addEventListener("DOMContentLoaded", () => {
       if (profileName) window.location.href = "index.html";
     }
   });
+
+  // --- Auth Tabs Logic ---
+  if (tabLogin && tabSignup) {
+    tabLogin.addEventListener("click", () => {
+      tabLogin.classList.add("active");
+      tabSignup.classList.remove("active");
+      formLogin.style.display = "flex";
+      formSignup.style.display = "none";
+    });
+    tabSignup.addEventListener("click", () => {
+      tabSignup.classList.add("active");
+      tabLogin.classList.remove("active");
+      formSignup.style.display = "flex";
+      formLogin.style.display = "none";
+    });
+  }
+
+  // --- Manual Login Logic ---
+  if (manualLoginBtn) {
+    manualLoginBtn.addEventListener("click", () => {
+      const email = document.getElementById("login-email").value;
+      const pass = document.getElementById("login-pass").value;
+      if (!email || !pass) return showToast("Preencha todos os campos.", "error");
+
+      toggleLoading(true);
+      signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          toggleLoading(false);
+          showToast("Login realizado!", "success");
+          if (loginModal) closeModalWithFade(loginModal);
+        })
+        .catch((error) => {
+          toggleLoading(false);
+          console.error(error);
+          if (error.code === 'auth/invalid-credential') showToast("E-mail ou senha incorretos.", "error");
+          else showToast("Erro ao fazer login.", "error");
+        });
+    });
+  }
+
+  // --- Manual Signup Logic ---
+  if (manualSignupBtn) {
+    manualSignupBtn.addEventListener("click", () => {
+      const email = document.getElementById("signup-email").value;
+      const pass = document.getElementById("signup-pass").value;
+      const confirm = document.getElementById("signup-confirm").value;
+      const age = document.getElementById("signup-age").value;
+      const country = document.getElementById("signup-country").value;
+      const file = signupPhoto ? signupPhoto.files[0] : null;
+
+      if (!email || !pass || !confirm || !age || !country) return showToast("Preencha todos os campos obrigatórios.", "error");
+      if (pass !== confirm) return showToast("As senhas não coincidem.", "error");
+
+      toggleLoading(true);
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then(async (userCredential) => {
+          const user = userCredential.user;
+          let photoURL = "";
+
+          // Upload Photo if exists
+          if (file) {
+            await new Promise((resolve) => {
+              resizeImage(file, 500, 500, (base64) => {
+                photoURL = base64;
+                resolve();
+              });
+            });
+          }
+
+          // Update Profile
+          await updateProfile(user, {
+            photoURL: photoURL
+          });
+
+          // Save extra data to Firestore
+          await setDoc(doc(db, "users", user.uid), {
+            email: email,
+            age: age,
+            country: country,
+            photoURL: photoURL,
+            displayName: email.split('@')[0], // Default display name
+            createdAt: new Date()
+          }, { merge: true });
+
+          toggleLoading(false);
+          showToast("Conta criada com sucesso!", "success");
+          if (loginModal) closeModalWithFade(loginModal);
+        })
+        .catch((error) => {
+          toggleLoading(false);
+          console.error(error);
+          if (error.code === 'auth/email-already-in-use') showToast("Este e-mail já está em uso.", "error");
+          else if (error.code === 'auth/weak-password') showToast("A senha é muito fraca.", "error");
+          else showToast("Erro ao criar conta.", "error");
+        });
+    });
+  }
+
+  // --- Require Login Helper ---
+  function requireLogin(callback) {
+    if (currentUser && !currentUser.isAnonymous) {
+      callback();
+    } else {
+      customConfirmLogin("Iniciar sessão para interagir", "Aviso").then((shouldLogin) => {
+        if (shouldLogin) {
+          if (loginModal) loginModal.style.display = "block";
+        }
+      });
+    }
+  }
+
+  // Custom Confirm for Login
+  window.customConfirmLogin = function (message, title) {
+    return new Promise((resolve) => {
+      dialogTitle.textContent = title;
+      dialogMessage.textContent = message;
+      dialogInputContainer.style.display = 'none';
+
+      dialogOk.textContent = "Iniciar sessão";
+      dialogCancel.textContent = "Fechar";
+      dialogCancel.style.display = 'inline-block';
+
+      dialogOverlay.classList.add('active');
+
+      dialogOk.onclick = () => {
+        dialogOverlay.classList.remove('active');
+        // Reset buttons
+        dialogOk.textContent = "OK";
+        dialogCancel.textContent = "Cancelar";
+        resolve(true);
+      };
+      dialogCancel.onclick = () => {
+        dialogOverlay.classList.remove('active');
+        dialogOk.textContent = "OK";
+        dialogCancel.textContent = "Cancelar";
+        resolve(false);
+      };
+    });
+  };
 
   // Profile Image Upload & Resize Logic
   function resizeImage(file, maxWidth, maxHeight, callback) {
@@ -1180,25 +1347,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Expose Like functions to window
   window.toggleNewsLike = function (id) {
-    if (!currentUser) return customAlert("Aguarde a inicialização...", "Sistema");
+    requireLogin(() => {
+      const likeRef = doc(db, "news_stats", String(id), "likes", currentUser.uid);
+      const statsRef = doc(db, "news_stats", String(id));
 
-    const likeRef = doc(db, "news_stats", String(id), "likes", currentUser.uid);
-    const statsRef = doc(db, "news_stats", String(id));
+      getDoc(likeRef).then((docSnap) => {
+        const isLiked = docSnap.exists() && docSnap.data().active;
 
-    getDoc(likeRef).then((docSnap) => {
-      const isLiked = docSnap.exists() && docSnap.data().active;
-
-      if (isLiked) {
-        // Remover Like
-        updateDoc(likeRef, { active: false });
-        setDoc(statsRef, { likesCount: increment(-1) }, { merge: true });
-        document.getElementById(`news-like-btn-${id}`).classList.remove("liked");
-      } else {
-        // Adicionar Like
-        setDoc(likeRef, { active: true }); // Cria ou sobrescreve
-        setDoc(statsRef, { likesCount: increment(1) }, { merge: true });
-        document.getElementById(`news-like-btn-${id}`).classList.add("liked");
-      }
+        if (isLiked) {
+          // Remover Like
+          updateDoc(likeRef, { active: false });
+          setDoc(statsRef, { likesCount: increment(-1) }, { merge: true });
+          document.getElementById(`news-like-btn-${id}`).classList.remove("liked");
+        } else {
+          // Adicionar Like
+          setDoc(likeRef, { active: true }); // Cria ou sobrescreve
+          setDoc(statsRef, { likesCount: increment(1) }, { merge: true });
+          document.getElementById(`news-like-btn-${id}`).classList.add("liked");
+        }
+      });
     });
   };
 
@@ -1324,32 +1491,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function saveComment(newsId, name, text, image, parentId = null, callback = null) {
-    if (!currentUser) {
-      return customAlert("Você precisa estar conectado para comentar.", "Erro");
-    }
-    const comment = {
-      userId: currentUser.uid,
-      name,
-      text,
-      image,
-      date: new Date().toLocaleDateString(),
-      likes: 0,
-      parentId: parentId,
-      timestamp: new Date()
-    };
+    requireLogin(() => {
+      const comment = {
+        userId: currentUser.uid,
+        name,
+        text,
+        image,
+        date: new Date().toLocaleDateString(),
+        likes: 0,
+        parentId: parentId,
+        timestamp: new Date()
+      };
 
-    addDoc(collection(db, "news_stats", String(newsId), "comments"), comment)
-      .then((docRef) => {
-        const statsRef = doc(db, "news_stats", String(newsId));
-        setDoc(statsRef, { commentsCount: increment(1) }, { merge: true });
+      addDoc(collection(db, "news_stats", String(newsId), "comments"), comment)
+        .then((docRef) => {
+          const statsRef = doc(db, "news_stats", String(newsId));
+          setDoc(statsRef, { commentsCount: increment(1) }, { merge: true });
 
-        // If it's a reply, create a notification
-        if (parentId) {
-          createReplyNotification(newsId, parentId, docRef.id, name);
-        }
+          // If it's a reply, create a notification
+          if (parentId) {
+            createReplyNotification(newsId, parentId, docRef.id, name);
+          }
 
-        if (callback) callback();
-      });
+          if (callback) callback();
+        });
+    });
   }
 
   function loadComments(newsId, containerId) {
@@ -1477,28 +1643,26 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.toggleCommentLike = function (newsId, commentId) {
-    if (!currentUser) {
-      return customAlert("Você precisa estar conectado para curtir.", "Aviso");
-    }
+    requireLogin(() => {
+      const likeRef = doc(db, "news_stats", String(newsId), "comments", String(commentId), "likes", currentUser.uid);
+      const commentRef = doc(db, "news_stats", String(newsId), "comments", String(commentId));
 
-    const likeRef = doc(db, "news_stats", String(newsId), "comments", String(commentId), "likes", currentUser.uid);
-    const commentRef = doc(db, "news_stats", String(newsId), "comments", String(commentId));
+      getDoc(likeRef).then((docSnap) => {
+        const isLiked = docSnap.exists() && docSnap.data().active;
 
-    getDoc(likeRef).then((docSnap) => {
-      const isLiked = docSnap.exists() && docSnap.data().active;
-
-      if (isLiked) {
-        updateDoc(likeRef, { active: false });
-        updateDoc(commentRef, { likes: increment(-1) });
-        document.getElementById(`comment-like-btn-${commentId}`).classList.remove("liked");
-      } else {
-        setDoc(likeRef, { active: true }, { merge: true });
-        updateDoc(commentRef, { likes: increment(1) });
-        document.getElementById(`comment-like-btn-${commentId}`).classList.add("liked");
-      }
-    }).catch((error) => {
-      console.error("Erro ao curtir comentário:", error);
-      customAlert("Erro ao curtir. Verifique sua conexão ou login.", "Erro");
+        if (isLiked) {
+          updateDoc(likeRef, { active: false });
+          updateDoc(commentRef, { likes: increment(-1) });
+          document.getElementById(`comment-like-btn-${commentId}`).classList.remove("liked");
+        } else {
+          setDoc(likeRef, { active: true }, { merge: true });
+          updateDoc(commentRef, { likes: increment(1) });
+          document.getElementById(`comment-like-btn-${commentId}`).classList.add("liked");
+        }
+      }).catch((error) => {
+        console.error("Erro ao curtir comentário:", error);
+        customAlert("Erro ao curtir. Verifique sua conexão ou login.", "Erro");
+      });
     });
   };
 
@@ -2137,6 +2301,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (googleLoginBtn) {
     googleLoginBtn.addEventListener("click", () => {
+      toggleLoading(true);
       const provider = new GoogleAuthProvider();
       signInWithRedirect(auth, provider);
     });
