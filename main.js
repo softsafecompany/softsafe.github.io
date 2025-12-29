@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
 // SUBSTITUA COM SUAS CREDENCIAIS REAIS DO CONSOLE DO FIREBASE
@@ -200,6 +200,18 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener('online', () => {
     showToast("Conexão restabelecida!", "success");
   });
+
+  // Verificar resultado do login por redirecionamento (Correção para erro de Popup/COOP)
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result) {
+        showToast("Login realizado com sucesso!", "success");
+      }
+    })
+    .catch((error) => {
+      console.error("Erro no login por redirecionamento:", error);
+      showToast("Erro ao fazer login.", "error");
+    });
 
   // --- Contact Modal Logic ---
   // Intercept links to #contato
@@ -2126,15 +2138,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (googleLoginBtn) {
     googleLoginBtn.addEventListener("click", () => {
       const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          showToast("Login realizado com sucesso!", "success");
-          if (loginModal) closeModalWithFade(loginModal);
-        })
-        .catch((error) => {
-          console.error("Erro no login:", error);
-          showToast("Erro ao fazer login.", "error");
-        });
+      signInWithRedirect(auth, provider);
     });
   }
 
