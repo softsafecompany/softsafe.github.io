@@ -3,6 +3,7 @@ import {
   getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, addDoc, query, orderBy, getDocs, where, runTransaction, deleteDoc, collectionGroup, writeBatch
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, setPersistence, browserLocalPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getStorage, ref, uploadString, getDownloadURL, uploadBytesResumable, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
 
@@ -22,6 +23,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 console.log("firebase inicializado");
 const auth = getAuth(app);
+const storage = getStorage(app);
 
 setPersistence(auth, browserLocalPersistence).catch((error) => {
   console.error("Erro ao definir persistência:", error);
@@ -89,11 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileEmail = document.getElementById("profile-email");
   const profileImg = document.getElementById("profile-img");
   const profileImgContainer = document.getElementById("profile-img-container");
-  if (profileImgContainer) {
-    profileImgContainer.style.margin = "0 auto";
-    profileImgContainer.style.display = "flex";
-    profileImgContainer.style.justifyContent = "center";
-  }
   const profileUpload = document.getElementById("profile-upload");
   const editNameBtn = document.getElementById("edit-name-btn");
   const resetPasswordBtn = document.getElementById("reset-password-btn");
@@ -309,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!user.isAnonymous) {
         // Logado com Google -> Botão Perfil
         if (loginBtn) {
-          loginBtn.textContent = "Perfil";
+          loginBtn.innerHTML = '<i class="fas fa-user-circle login-icon"></i>';
           loginBtn.onclick = () => window.location.href = 'perfil.html';
         }
 
@@ -334,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         // Usuário Anônimo -> Botão Login
         if (loginBtn) {
-          loginBtn.textContent = "Login";
+          loginBtn.innerHTML = '<i class="fas fa-sign-in-alt login-icon"></i>';
           loginBtn.onclick = () => { if (loginModal) loginModal.style.display = "block"; };
         }
         // Redirect anonymous from profile
@@ -351,7 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
         unsubscribeNotifications = null;
       }
       if (loginBtn) {
-        loginBtn.textContent = "Login";
+        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt login-icon"></i>';
         loginBtn.onclick = () => { if (loginModal) loginModal.style.display = "block"; };
       }
       // Redirect logged out from profile
@@ -421,8 +418,17 @@ document.addEventListener("DOMContentLoaded", () => {
           if (file) {
             await new Promise((resolve) => {
               resizeImage(file, 500, 500, (base64) => {
-                photoURL = base64;
-                resolve();
+                const storageRef = ref(storage, `users/${user.uid}/profile.jpg`);
+                uploadString(storageRef, base64, 'data_url')
+                  .then(() => getDownloadURL(storageRef))
+                  .then((url) => {
+                    photoURL = url;
+                    resolve();
+                  })
+                  .catch((err) => {
+                    console.error("Erro upload imagem signup:", err);
+                    resolve(); // Continua mesmo se falhar o upload
+                  });
               });
             });
           }
@@ -527,32 +533,43 @@ document.addEventListener("DOMContentLoaded", () => {
   if (profileImgContainer && profileUpload) {
     // --- Profile Image Logic (Preview, Delete, Crop) ---
     const profileModalsHTML = `
-      <div id="profile-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); z-index:10001; align-items:center; justify-content:center;">
-        <div style="background:var(--card-bg, #fff); width:60%; max-width:600px; padding:20px; border-radius:12px; text-align:center; position:relative; display:flex; flex-direction:column; gap:20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-          <h3 style="margin:0; color:var(--text-color, #333);">Foto de Perfil</h3>
-          <div style="width:100%; height:300px; display:flex; align-items:center; justify-content:center; background:#f0f0f0; border-radius:8px; overflow:hidden;">
-            <img id="profile-preview-img" src="" style="max-width:100%; max-height:100%; object-fit:contain;">
+      <div id="profile-preview-modal" class="profile-preview-modal">
+        <div class="profile-preview-content">
+          <h3 class="profile-preview-title">Foto de Perfil</h3>
+          <div class="profile-preview-image-box">
+            <img id="profile-preview-img" src="" class="profile-preview-img">
           </div>
-          <div style="display:flex; justify-content:space-between; width:100%; gap:10px;">
-            <button id="btn-delete-photo" style="flex:1; background:#e74c3c; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold;">Apagar</button>
-            <button id="btn-change-photo" style="flex:1; background:#3498db; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold;">Alterar</button>
+          <div id="preview-actions-default" class="profile-action-row">
+            <button id="btn-delete-photo" class="btn-danger">Apagar</button>
+            <button id="btn-change-photo" class="btn-primary">Alterar</button>
           </div>
-          <button id="close-profile-preview" style="position:absolute; top:10px; right:15px; background:transparent; border:none; font-size:24px; cursor:pointer; color:var(--text-color, #333);">&times;</button>
+          <div id="preview-actions-confirm" class="profile-action-row" style="display:none;">
+             <button id="btn-cancel-confirm" class="btn-secondary">Cancelar</button>
+             <button id="btn-confirm-photo" class="btn-success">Salvar Foto</button>
+          </div>
+          <div id="upload-progress-container" class="upload-progress-container">
+            <div class="upload-progress-track">
+              <div id="upload-progress-bar" class="upload-progress-bar"></div>
+            </div>
+            <p id="upload-progress-text" class="upload-progress-text">0%</p>
+          </div>
+          <button id="close-profile-preview" class="close-preview-btn">&times;</button>
         </div>
       </div>
 
-      <div id="crop-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10002; align-items:center; justify-content:center; flex-direction:column;">
-        <div style="background:white; padding:20px; border-radius:10px; text-align:center;">
-          <h3 style="color:#333; margin-bottom:15px;">Ajustar Foto</h3>
-          <div id="crop-area" style="width:300px; height:300px; border:2px solid #333; overflow:hidden; position:relative; background:#ccc; margin:0 auto; cursor:grab;">
-            <img id="crop-img" src="" style="position:absolute; transform-origin: top left; pointer-events: none;">
+      <div id="crop-modal" class="crop-modal">
+        <div id="crop-modal-content" class="crop-modal-content">
+          <h3 class="crop-title">Ajustar Foto</h3>
+          <div id="crop-area" class="crop-area">
+            <img id="crop-img" src="" class="crop-img">
+            <div id="crop-drop-zone" class="crop-drop-zone">Solte a imagem aqui</div>
           </div>
-          <div style="margin:15px 0;">
-            <label style="color:#333;">Zoom: <input type="range" id="crop-zoom-range" min="0.5" max="3" step="0.1" value="1"></label>
+          <div class="crop-controls">
+            <label class="crop-label">Zoom: <input type="range" id="crop-zoom-range" min="0.5" max="3" step="0.1" value="1"></label>
           </div>
-          <div style="display:flex; gap:10px; justify-content:center;">
-            <button id="btn-cancel-crop" style="background:#95a5a6; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Cancelar</button>
-            <button id="btn-save-crop" style="background:#2ecc71; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Salvar</button>
+          <div class="crop-actions">
+            <button id="btn-cancel-crop" class="btn-secondary">Cancelar</button>
+            <button id="btn-save-crop" class="btn-success">Pré-visualizar</button>
           </div>
         </div>
       </div>
@@ -563,20 +580,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const profilePreviewImg = document.getElementById("profile-preview-img");
     const btnDeletePhoto = document.getElementById("btn-delete-photo");
     const btnChangePhoto = document.getElementById("btn-change-photo");
+    const btnConfirmPhoto = document.getElementById("btn-confirm-photo");
+    const btnCancelConfirm = document.getElementById("btn-cancel-confirm");
+    const previewActionsDefault = document.getElementById("preview-actions-default");
+    const previewActionsConfirm = document.getElementById("preview-actions-confirm");
     const closeProfilePreview = document.getElementById("close-profile-preview");
 
     const cropModal = document.getElementById("crop-modal");
+    const cropModalContent = document.getElementById("crop-modal-content");
     const cropImg = document.getElementById("crop-img");
     const cropArea = document.getElementById("crop-area");
+    const cropDropZone = document.getElementById("crop-drop-zone");
     const cropZoomRange = document.getElementById("crop-zoom-range");
     const btnCancelCrop = document.getElementById("btn-cancel-crop");
     const btnSaveCrop = document.getElementById("btn-save-crop");
 
     let cropState = { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 };
+    let pendingBlob = null;
 
     profileImgContainer.addEventListener("click", () => {
       if (profileImg) {
         profilePreviewImg.src = profileImg.src;
+        previewActionsDefault.style.display = "flex";
+        previewActionsConfirm.style.display = "none";
         profilePreviewModal.style.display = "flex";
       }
     });
@@ -588,6 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
       customConfirm("Tem certeza que deseja remover sua foto de perfil?", "Remover Foto").then((confirmed) => {
         if (confirmed && currentUser) {
           toggleLoading(true);
+          deleteObject(ref(storage, `users/${currentUser.uid}/profile.jpg`)).catch(() => { });
           updateDoc(doc(db, "users", currentUser.uid), { photoURL: "" })
             .then(() => { toggleLoading(false); showToast("Foto removida!", "success"); profilePreviewModal.style.display = "none"; })
             .catch((err) => { toggleLoading(false); console.error(err); showToast("Erro ao remover foto.", "error"); });
@@ -600,8 +627,12 @@ document.addEventListener("DOMContentLoaded", () => {
       profileUpload.click();
     });
 
-    profileUpload.addEventListener("change", (e) => {
-      if (e.target.files && e.target.files[0]) {
+    const handleFileSelect = (file) => {
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          showToast("Arquivo muito grande (Max 5MB).", "error");
+          return;
+        }
         const reader = new FileReader();
         reader.onload = (evt) => {
           cropImg.src = evt.target.result;
@@ -609,15 +640,48 @@ document.addEventListener("DOMContentLoaded", () => {
           cropState = { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 };
           cropZoomRange.value = 1;
           cropImg.onload = () => {
-            cropState.x = (300 - cropImg.naturalWidth) / 2;
-            cropState.y = (300 - cropImg.naturalHeight) / 2;
+            // Ajustar imagem ao tamanho do modal (300x300)
+            const containerSize = 300;
+            const w = cropImg.naturalWidth;
+            const h = cropImg.naturalHeight;
+            let scale = w > h ? containerSize / w : containerSize / h;
+
+            cropState.scale = scale;
+            cropState.x = (containerSize - w * scale) / 2;
+            cropState.y = (containerSize - h * scale) / 2;
+
+            cropZoomRange.min = scale * 0.5;
+            cropZoomRange.max = scale * 3;
+            cropZoomRange.step = scale * 0.1;
+            cropZoomRange.value = scale;
             updateCropTransform();
           };
         };
-        reader.readAsDataURL(e.target.files[0]);
+        reader.readAsDataURL(file);
+      }
+    };
+
+    profileUpload.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleFileSelect(e.target.files[0]);
       }
       profileUpload.value = "";
     });
+
+    // Drag and Drop Logic for Crop Modal
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      cropModalContent.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      cropModalContent.addEventListener(eventName, () => cropDropZone.style.display = 'flex', false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      cropModalContent.addEventListener(eventName, () => cropDropZone.style.display = 'none', false);
+    });
+    cropModalContent.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt.files && dt.files[0]) handleFileSelect(dt.files[0]);
+    }, false);
 
     function updateCropTransform() { cropImg.style.transform = `translate(${cropState.x}px, ${cropState.y}px) scale(${cropState.scale})`; }
 
@@ -628,16 +692,69 @@ document.addEventListener("DOMContentLoaded", () => {
     btnCancelCrop.addEventListener("click", () => cropModal.style.display = "none");
 
     btnSaveCrop.addEventListener("click", () => {
-      toggleLoading(true);
       const canvas = document.createElement("canvas");
       canvas.width = 300; canvas.height = 300;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(cropImg, cropState.x, cropState.y, cropImg.naturalWidth * cropState.scale, cropImg.naturalHeight * cropState.scale);
-      const base64 = canvas.toDataURL("image/jpeg", 0.8);
-      if (currentUser) {
-        updateDoc(doc(db, "users", currentUser.uid), { photoURL: base64 })
-          .then(() => { toggleLoading(false); showToast("Foto atualizada!", "success"); cropModal.style.display = "none"; })
-          .catch((err) => { toggleLoading(false); console.error(err); showToast("Erro ao salvar foto.", "error"); });
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          pendingBlob = blob;
+          const url = URL.createObjectURL(blob);
+          profilePreviewImg.src = url;
+          cropModal.style.display = "none";
+          profilePreviewModal.style.display = "flex";
+          previewActionsDefault.style.display = "none";
+          previewActionsConfirm.style.display = "flex";
+        }
+      }, "image/jpeg", 0.8);
+    });
+
+    btnCancelConfirm.addEventListener("click", () => {
+      profilePreviewModal.style.display = "none";
+      pendingBlob = null;
+    });
+
+    btnConfirmPhoto.addEventListener("click", () => {
+      if (currentUser && pendingBlob) {
+        const storageRef = ref(storage, `users/${currentUser.uid}/profile.jpg`);
+        const uploadTask = uploadBytesResumable(storageRef, pendingBlob);
+
+        const progressContainer = document.getElementById("upload-progress-container");
+        const progressBar = document.getElementById("upload-progress-bar");
+        const progressText = document.getElementById("upload-progress-text");
+
+        progressContainer.style.display = "block";
+        btnConfirmPhoto.disabled = true;
+        btnCancelConfirm.disabled = true;
+
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            progressBar.style.width = progress + "%";
+            progressText.textContent = Math.round(progress) + "%";
+          },
+          (error) => {
+            console.error(error);
+            showToast("Erro no upload.", "error");
+            progressContainer.style.display = "none";
+            btnConfirmPhoto.disabled = false;
+            btnCancelConfirm.disabled = false;
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+              updateDoc(doc(db, "users", currentUser.uid), { photoURL: url })
+                .then(() => {
+                  showToast("Foto atualizada!", "success");
+                  profilePreviewModal.style.display = "none";
+                  progressContainer.style.display = "none";
+                  btnConfirmPhoto.disabled = false;
+                  btnCancelConfirm.disabled = false;
+                  pendingBlob = null;
+                });
+            });
+          }
+        );
       }
     });
   }
@@ -1704,7 +1821,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="comment-content">
           <h5>${c.name} <small class="comment-date">${c.date}</small></h5>
           <p>${c.text}</p>
-          ${c.image ? `<img src="${c.image}" class="comment-img" style="cursor:zoom-in">` : ''}
+          ${c.image ? `<img src="${c.image}" class="comment-img">` : ''}
           <div class="comment-actions">
              <button id="comment-like-btn-${c.id}" class="comment-like-btn" onclick="toggleCommentLike(${newsId}, '${c.id}')">
                👍 <span id="comment-like-count-${c.id}">${c.likes || 0}</span>
@@ -2736,6 +2853,9 @@ document.addEventListener("DOMContentLoaded", () => {
               // 1. Preparar exclusão do perfil
               batch.delete(doc(db, "users", currentUser.uid));
 
+              // Deletar foto do Storage
+              deleteObject(ref(storage, `users/${currentUser.uid}/profile.jpg`)).catch(() => { });
+
               // 2. Tentar buscar e excluir comentários (Requer índice 'userId' em collectionGroup 'comments')
               const commentsQuery = query(collectionGroup(db, 'comments'), where('userId', '==', currentUser.uid));
 
@@ -2853,12 +2973,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Cookie Banner Logic ---
   const cookieBannerHTML = `
-    <div id="cookie-banner" class="cookie-banner" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #222; color: #fff; padding: 15px; text-align: center; z-index: 10000; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); font-family: sans-serif;">
-      <p style="margin: 0 0 10px 0; font-size: 14px; display: inline-block; margin-right: 10px;">
+    <div id="cookie-banner" class="cookie-banner">
+      <p class="cookie-text">
         Utilizamos cookies para melhorar sua experiência. Ao continuar, você concorda com nossa 
-        <a href="#" id="cookie-privacy-link" style="color: #4CAF50; text-decoration: underline;">Política de Privacidade</a>.
+        <a href="#" id="cookie-privacy-link" class="cookie-link">Política de Privacidade</a>.
       </p>
-      <button id="accept-cookies-btn" style="background: #4CAF50; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Aceitar</button>
+      <button id="accept-cookies-btn" class="cookie-btn">Aceitar</button>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', cookieBannerHTML);
